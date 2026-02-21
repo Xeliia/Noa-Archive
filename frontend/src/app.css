@@ -127,6 +127,7 @@ body {
 /* ── Dark mode text colors ── */
 [data-theme="nord-dark"] .text-nord-0 { color: #ECEFF4 !important; }
 [data-theme="nord-dark"] .text-nord-3 { color: #D8DEE9 !important; }
+[data-theme="nord-dark"] .text-nord-3\/70 { color: rgba(216, 222, 233, 0.7) !important; }
 [data-theme="nord-dark"] .text-white { color: #ECEFF4 !important; }
 
 /* ── Dark mode backgrounds ── */
