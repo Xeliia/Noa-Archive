@@ -1,6 +1,6 @@
 <script>
   import { tick } from 'svelte'
-  import { Send, Trash, Info, X, Github, ExternalLink, Cake, Sun, Moon } from 'lucide-svelte';
+  import { Send, Trash, Info, X, Github, ExternalLink, Cake, Sun, Moon, Eye, Pen, Book } from 'lucide-svelte';
 
   const SYSTEM_PROMPT = `You are a helpful, warm AI assistant named Ushio Noa. Keep responses concise and conversational.`
 
@@ -191,16 +191,31 @@
   function handleTiltLeave(e) {
     e.currentTarget.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)'
   }
+
+  /* ── Close any open panel (for mobile overlay) ── */
+  function closeAllPanels() {
+    showCharacterCard = false
+    showProjectCard = false
+  }
 </script>
+
+<!-- Mobile/Tablet overlay backdrop -->
+<!-- svelte-ignore a11y_no_static_element_interactions -->
+<div 
+  class="mobile-overlay lg:hidden {showCharacterCard || showProjectCard ? 'active' : ''}"
+  onclick={closeAllPanels}
+  onkeydown={(e) => e.key === 'Escape' && closeAllPanels()}
+  role="presentation"
+></div>
 
 <div data-theme={isDark ? 'nord-dark' : 'nord'} class="theme-wrapper min-h-screen flex items-center justify-center p-4 md:p-8 gap-4">
 
   <!-- ─── Character Info Card (Left) ─── -->
-  <div class="card-panel-wrapper shrink-0 overflow-hidden transition-all duration-300 ease-out" style="width: {showCharacterCard ? '24rem' : '0'}; height: min(700px, 85vh);">
-    <div class="character-card w-96 h-full flex flex-col rounded-3xl overflow-hidden" style="opacity: {showCharacterCard ? '1' : '0'}; transform: translateX({showCharacterCard ? '0' : '-2rem'});">
+  <div class="card-panel-wrapper shrink-0 overflow-hidden transition-all duration-300 ease-out {showCharacterCard ? '' : 'max-lg:pointer-events-none'}" style="width: {showCharacterCard ? '24rem' : '0'}; height: min(700px, 85vh);">
+    <div class="character-card w-96 h-full flex flex-col rounded-3xl overflow-hidden" style="opacity: {showCharacterCard ? '1' : '0'}; transform: translateX({showCharacterCard ? '0' : '-100%'});">
       <!-- Close button -->
       <button 
-        class="absolute top-3 right-3 z-10 w-8 h-8 rounded-full bg-white/80 backdrop-blur flex items-center justify-center text-nord-3 hover:text-nord-0 hover:bg-white transition-all shadow-sm"
+        class="absolute top-3 right-3 z-10 w-8 h-8 rounded-full bg-white/80 backdrop-blur flex items-center justify-center text-nord-3 hover:text-nord-0 hover:bg-white transition-all shadow-sm cursor-pointer"
         onclick={() => showCharacterCard = false}
       >
         <X size={16} />
@@ -259,7 +274,7 @@
   </div>
 
   <!-- ─── Main Chat Card ─── -->
-  <div class="chat-card w-full max-w-2xl flex flex-col overflow-hidden" style="height: min(1000px, 90vh); width: min(1200px, 90vw);">
+  <div class="chat-card w-full max-w-2xl flex flex-col overflow-hidden" style="height: min(1000px, 90vh); width: clamp(320px, 90vw, 1200px);">
 
     <!-- ─── Header ─── -->
     <div class="flex items-center gap-3 px-6 py-4 border-b border-nord-5">
@@ -383,10 +398,10 @@
 
             <!-- Stats card -->
             {#if msg.stats}
-              <div class="w-full mt-2 bg-white border border-nord-5 rounded-2xl overflow-hidden">
-                <div class="grid grid-cols-3 divide-x divide-nord-5">
+              <div class="stats-card w-full mt-2 bg-white border border-nord-5 rounded-2xl overflow-hidden">
+                <div class="stats-grid grid grid-cols-3 divide-x divide-nord-5">
                   {#each msg.stats as stat}
-                    <div class="flex flex-col items-center py-4 px-3 gap-1.5">
+                    <div class="stat-item flex flex-col items-center py-4 px-3 gap-1.5">
                       <!-- Icon -->
                       <div class="text-nord-3">
                         {#if stat.icon === 'eye'}
@@ -494,11 +509,11 @@
   </div>
 
   <!-- ─── Project Info Card (Right) ─── -->
-  <div class="card-panel-wrapper shrink-0 overflow-hidden transition-all duration-300 ease-out" style="width: {showProjectCard ? '20rem' : '0'}; height: min(600px, 80vh);">
-    <div class="project-card w-80 h-full flex flex-col rounded-3xl overflow-hidden" style="opacity: {showProjectCard ? '1' : '0'}; transform: translateX({showProjectCard ? '0' : '2rem'});">
+  <div class="card-panel-wrapper shrink-0 overflow-hidden transition-all duration-300 ease-out {showProjectCard ? '' : 'max-lg:pointer-events-none'}" style="width: {showProjectCard ? '20rem' : '0'}; height: min(600px, 80vh);">
+    <div class="project-card w-80 h-full flex flex-col rounded-3xl overflow-hidden" style="opacity: {showProjectCard ? '1' : '0'}; transform: translateX({showProjectCard ? '0' : '100%'});">
       <!-- Close button -->
       <button 
-        class="absolute top-3 right-3 z-10 w-8 h-8 rounded-full bg-white/80 backdrop-blur flex items-center justify-center text-nord-3 hover:text-nord-0 hover:bg-white transition-all shadow-sm"
+        class="absolute top-3 right-3 z-10 w-8 h-8 rounded-full bg-white/80 backdrop-blur flex items-center justify-center text-nord-3 hover:text-nord-0 hover:bg-white transition-all shadow-sm cursor-pointer"
         onclick={() => showProjectCard = false}
       >
         <X size={16} />
@@ -529,7 +544,9 @@
             <span class="aurora-pill aurora-red">Svelte 5</span>
             <span class="aurora-pill aurora-orange">Tailwind CSS</span>
             <span class="aurora-pill aurora-yellow">DaisyUI</span>
-            <span class="aurora-pill aurora-green">Local LLM</span>
+            <span class="aurora-pill aurora-purple">Local LLM</span>
+            <span class="aurora-pill aurora-green">FastAPI</span>
+            <span class="aurora-pill aurora-red">ngrok</span>
           </div>
         </div>
 
@@ -556,13 +573,13 @@
         <div>
           <h3 class="text-xs text-nord-3 uppercase tracking-wider font-medium mb-3">Links</h3>
           <div class="flex flex-col gap-2">
-            <!-- PLACEHOLDER: Update these links -->
-            <a href="#" class="flex items-center gap-3 px-4 py-3 bg-nord-6 hover:bg-nord-5 rounded-xl transition-colors group">
+            <!-- TODO: Update these hrefs with actual links -->
+            <a href="https://github.com" target="_blank" rel="noopener noreferrer" class="flex items-center gap-3 px-4 py-3 bg-nord-6 hover:bg-nord-5 rounded-xl transition-colors group">
               <Github size={18} class="text-nord-0" />
               <span class="text-sm text-nord-0 font-medium">GitHub Repository</span>
               <ExternalLink size={14} class="text-nord-3 ml-auto opacity-0 group-hover:opacity-100 transition-opacity" />
             </a>
-            <a href="#" class="flex items-center gap-3 px-4 py-3 bg-nord-6 hover:bg-nord-5 rounded-xl transition-colors group">
+            <a href="https://example.com" target="_blank" rel="noopener noreferrer" class="flex items-center gap-3 px-4 py-3 bg-nord-6 hover:bg-nord-5 rounded-xl transition-colors group">
               <ExternalLink size={18} class="text-nord-0" />
               <span class="text-sm text-nord-0 font-medium">Live Demo</span>
               <ExternalLink size={14} class="text-nord-3 ml-auto opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -592,15 +609,20 @@
     role="button"
     tabindex="0"
   >
+    <!-- svelte-ignore a11y_no_static_element_interactions -->
     <div 
       class="{closingLightbox ? 'lightbox-card-closing' : 'lightbox-card'}"
       onclick={(e) => e.stopPropagation()}
+      onkeydown={(e) => e.stopPropagation()}
+      role="presentation"
     >
       <div 
         class="cover-3d-card rounded-3xl overflow-hidden shadow-2xl" 
         style="max-width: 80vw; max-height: 80vh;"
         onmousemove={handleTiltMove}
         onmouseleave={handleTiltLeave}
+        role="img"
+        aria-label="Noa cover photo with 3D tilt effect"
       >
         <img 
           src="/src/assets/cover-photo.jpg" 

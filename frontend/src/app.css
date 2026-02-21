@@ -77,6 +77,8 @@ body {
   font-family: var(--font-sans);
   background: linear-gradient(135deg, #dde4ea 0%, #c8d5de 50%, #d8dee9 100%);
   transition: background 0.4s ease;
+  min-width: 320px;
+  overflow-x: auto;
 }
 
 /* Theme transition wrapper */
@@ -138,6 +140,21 @@ body {
 /* ── Dark mode borders ── */
 [data-theme="nord-dark"] .border-nord-5 { border-color: #4C566A !important; }
 [data-theme="nord-dark"] .border-white { border-color: #434C5E !important; }
+
+/* Stats card dark mode */
+[data-theme="nord-dark"] .stats-card {
+  background-color: #3B4252 !important;
+  border-color: #4C566A !important;
+}
+
+/* Stats card dividers in dark mode - target the stat items directly */
+[data-theme="nord-dark"] .stats-grid > .stat-item {
+  border-color: #4C566A !important;
+}
+
+[data-theme="nord-dark"] .stats-grid > .stat-item + .stat-item {
+  border-left-color: #4C566A !important;
+}
 
 /* ── Dark mode header icons ── */
 [data-theme="nord-dark"] .btn-ghost {
@@ -366,6 +383,7 @@ body {
     0 0 0 1px rgba(216, 222, 233, 0.5);
   transition: background-color 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
   overflow: hidden;
+  min-width: 320px;
 }
 
 /* ── Character/Project card styles ── */
@@ -589,4 +607,166 @@ body {
 /* Aurora glow on status indicator in dark mode */
 [data-theme="nord-dark"] .bg-nord-14 {
   box-shadow: 0 0 8px rgba(163, 190, 140, 0.6);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════════
+   MOBILE/TABLET RESPONSIVE STYLES
+   ═══════════════════════════════════════════════════════════════════════════════ */
+
+/* Base mobile overlay styles (used by both mobile and tablet) */
+.mobile-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  z-index: 35;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.mobile-overlay.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Mobile: Chat card full screen */
+@media (max-width: 767px) {
+  .theme-wrapper {
+    padding: 0 !important;
+    gap: 0 !important;
+  }
+
+  .chat-card {
+    max-width: 100% !important;
+    width: 100% !important;
+    height: 100vh !important;
+    height: 100dvh !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+  }
+
+  /* Side cards become fixed overlays on mobile */
+  .card-panel-wrapper {
+    position: fixed !important;
+    top: 0 !important;
+    height: 100vh !important;
+    height: 100dvh !important;
+    z-index: 40 !important;
+    border-radius: 0 !important;
+  }
+
+  /* Left card (Character) */
+  .card-panel-wrapper:has(.character-card) {
+    left: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  .card-panel-wrapper:has(.character-card) .character-card {
+    width: 100% !important;
+    max-width: 100% !important;
+    border-radius: 0 !important;
+  }
+
+  /* Right card (Project) */
+  .card-panel-wrapper:has(.project-card) {
+    right: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  .card-panel-wrapper:has(.project-card) .project-card {
+    width: 100% !important;
+    max-width: 100% !important;
+    border-radius: 0 !important;
+  }
+
+  /* Adjust header padding */
+  .chat-card .flex.items-center.gap-3.px-6 {
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+  }
+
+  /* Adjust message area padding */
+  .chat-card .overflow-y-auto.px-5 {
+    padding-left: 0.75rem !important;
+    padding-right: 0.75rem !important;
+  }
+
+  /* Adjust input area padding */
+  .chat-card .px-5.py-4 {
+    padding-left: 0.75rem !important;
+    padding-right: 0.75rem !important;
+    padding-bottom: max(1rem, env(safe-area-inset-bottom)) !important;
+  }
+
+  /* Lightbox adjustments for mobile */
+  .lightbox-overlay {
+    padding: 1rem !important;
+  }
+
+  .cover-3d-card {
+    max-width: 95vw !important;
+    max-height: 70vh !important;
+  }
+
+  .lightbox-overlay .absolute.top-6.right-6 {
+    top: 1rem !important;
+    right: 1rem !important;
+  }
+}
+
+/* Tablet: Side cards become overlays too (to prevent squishing) */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .card-panel-wrapper {
+    position: fixed !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    height: auto !important;
+    max-height: 85vh !important;
+    z-index: 40 !important;
+    border-radius: 24px !important;
+  }
+
+  .card-panel-wrapper:has(.character-card) {
+    left: 2rem !important;
+    width: 22rem !important;
+  }
+
+  .card-panel-wrapper:has(.project-card) {
+    right: 2rem !important;
+    left: auto !important;
+    width: 20rem !important;
+  }
+
+  .character-card {
+    width: 22rem !important;
+    height: auto !important;
+    max-height: 85vh !important;
+  }
+
+  .project-card {
+    width: 20rem !important;
+    height: auto !important;
+    max-height: 85vh !important;
+  }
+
+  /* Show backdrop on tablet too */
+  .mobile-overlay {
+    display: block !important;
+  }
+}
+
+/* Large screens: original push behavior */
+@media (min-width: 1024px) {
+  .card-panel-wrapper {
+    position: relative !important;
+    transform: none !important;
+    top: auto !important;
+  }
+
+  .mobile-overlay {
+    display: none !important;
+  }
 }
