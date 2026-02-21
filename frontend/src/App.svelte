@@ -1,13 +1,23 @@
 <script>
   import { tick } from 'svelte'
-  import { Send, Trash, Info, X, Github, ExternalLink, Cake } from 'lucide-svelte';
+  import { Send, Trash, Info, X, Github, ExternalLink, Cake, Sun, Moon } from 'lucide-svelte';
 
   const SYSTEM_PROMPT = `You are a helpful, warm AI assistant named Ushio Noa. Keep responses concise and conversational.`
+
+  /* ── Theme state ── */
+  let isDark = $state(false)
+  
+  function toggleTheme() {
+    isDark = !isDark
+  }
 
   /* ── Card panel states ── */
   let showCharacterCard = $state(false)
   let showProjectCard = $state(false)
   let showLightbox = $state(false)
+  
+  /* ── Profile flip state ── */
+  let profileFlipped = $state(false)
   
   /* ── Closing animation states ── */
   let closingLightbox = $state(false)
@@ -183,11 +193,11 @@
   }
 </script>
 
-<div data-theme="nord" class="min-h-screen flex items-center justify-center p-4 md:p-8 gap-4">
+<div data-theme={isDark ? 'nord-dark' : 'nord'} class="theme-wrapper min-h-screen flex items-center justify-center p-4 md:p-8 gap-4">
 
   <!-- ─── Character Info Card (Left) ─── -->
   <div class="card-panel-wrapper shrink-0 overflow-hidden transition-all duration-300 ease-out" style="width: {showCharacterCard ? '24rem' : '0'}; height: min(700px, 85vh);">
-    <div class="character-card w-96 h-full flex flex-col bg-white rounded-3xl shadow-xl overflow-hidden transition-all duration-300 ease-out" style="opacity: {showCharacterCard ? '1' : '0'}; transform: translateX({showCharacterCard ? '0' : '-2rem'});">
+    <div class="character-card w-96 h-full flex flex-col rounded-3xl overflow-hidden" style="opacity: {showCharacterCard ? '1' : '0'}; transform: translateX({showCharacterCard ? '0' : '-2rem'});">
       <!-- Close button -->
       <button 
         class="absolute top-3 right-3 z-10 w-8 h-8 rounded-full bg-white/80 backdrop-blur flex items-center justify-center text-nord-3 hover:text-nord-0 hover:bg-white transition-all shadow-sm"
@@ -198,11 +208,18 @@
 
       <!-- Profile section -->
       <div class="flex flex-col items-center pt-8 pb-6 px-6 bg-gradient-to-b from-nord-8/20 to-transparent">
-        <!-- Avatar -->
+        <!-- Avatar (flippable) -->
         <div class="relative mb-4">
-          <div class="w-32 h-32 rounded-full bg-gradient-to-br from-nord-8/30 to-nord-9/30 p-1">
-            <img src="/src/assets/mini-profile.png" alt="Ushio Noa" class="w-full h-full rounded-full object-cover" />
-          </div>
+          <button 
+            class="profile-image-wrapper w-32 h-32 rounded-full bg-gradient-to-br from-nord-8/30 to-nord-9/30 p-1 cursor-pointer"
+            class:flipped={profileFlipped}
+            onclick={() => profileFlipped = !profileFlipped}
+          >
+            <div class="flipper w-full h-full">
+              <img src="/src/assets/mini-profile.png" alt="Ushio Noa - Front" class="profile-face profile-front" />
+              <img src="/src/assets/mini-profile2.png" alt="Ushio Noa - Back" class="profile-face profile-back" />
+            </div>
+          </button>
         </div>
 
         <!-- Name -->
@@ -210,9 +227,9 @@
         <p class="text-sm text-nord-3 italic mb-4">The Melancholy of Kivotos</p>
 
         <!-- Birthday badge -->
-        <div class="inline-flex items-center gap-2 px-4 py-2 bg-white rounded-full border border-nord-5 shadow-sm">
-          <Cake size={16} class="text-nord-8" />
-          <span class="text-sm text-nord-0 font-medium">April 13th</span>
+        <div class="aurora-pill aurora-purple inline-flex items-center gap-2">
+          <Cake size={16} />
+          <span class="text-sm font-medium">April 13th</span>
         </div>
       </div>
 
@@ -254,8 +271,8 @@
           showProjectCard = false
         }}
       >
-        <img src="/src/assets/mini-profile.png" alt="Ushio Noa" class="w-11 h-11 rounded-full object-cover shadow-sm transition-transform group-hover:scale-105" />
-        <span class="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-nord-14 rounded-full border-2 border-white"></span>
+        <img src="/src/assets/mini-profile.png" alt="Ushio Noa" class="header-avatar w-11 h-11 rounded-full object-cover shadow-sm transition-transform group-hover:scale-105" />
+        <span class="status-indicator absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-nord-14 rounded-full border-2 border-white"></span>
       </button>
 
       <!-- Name & status -->
@@ -269,6 +286,21 @@
 
       <!-- Utility icons -->
       <div class="flex items-center gap-1">
+        <!-- Theme Toggle -->
+        <button 
+          class="theme-toggle btn btn-ghost btn-sm btn-square transition-colors"
+          onclick={toggleTheme}
+          title={isDark ? "Switch to light mode" : "Switch to dark mode"}
+        >
+          <div class="theme-icon-wrapper">
+            {#if isDark}
+              <Sun size={18} class="theme-icon sun-icon" />
+            {:else}
+              <Moon size={18} class="theme-icon moon-icon" />
+            {/if}
+          </div>
+        </button>
+        
         <!-- Info -->
         <button 
           class="btn btn-ghost btn-sm btn-square text-nord-3 hover:text-nord-0 transition-colors"
@@ -332,39 +364,6 @@
               </div>
             </div>
           {/if}
-
-        <!-- ── Audio message ── -->
-        {:else if msg.type === 'audio'}
-          <div class="msg-enter flex gap-2 items-end">
-            <!-- Avatar -->
-            {#if shouldShowAvatar(i)}
-              <img src="/src/assets/mini-profile.png" alt="Ushio Noa" class="w-7 h-7 rounded-full object-cover shrink-0" />
-            {:else}
-              <div class="w-7 shrink-0"></div>
-            {/if}
-            
-            <div class="flex flex-col items-start">
-              <div class="bg-white border border-nord-5 rounded-[18px] rounded-bl-[4px] px-4 py-3 flex items-center gap-3 max-w-[78%]">
-                <!-- Play button -->
-                <button class="w-9 h-9 rounded-full bg-nord-0 flex items-center justify-center shrink-0 hover:bg-nord-1 transition-colors">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-white ml-0.5" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M8 5v14l11-7z"/>
-                  </svg>
-                </button>
-                <!-- Waveform -->
-                <div class="flex items-center gap-[2px] h-7 flex-1">
-                  {#each WAVEFORM as h, i}
-                    <span class="waveform-bar {i < 12 ? 'opacity-100' : 'opacity-30'}" style="height: {h}px;"></span>
-                  {/each}
-                </div>
-                <!-- Duration -->
-                <span class="text-xs text-nord-3 font-medium shrink-0">{msg.duration}</span>
-              </div>
-              {#if shouldShowTime(i)}
-                <span class="text-[11px] text-nord-3/70 mt-1 px-1">{formatTime(msg.time)}</span>
-              {/if}
-            </div>
-          </div>
 
         <!-- ── Rich message (text + stats + images) ── -->
         {:else if msg.type === 'rich'}
@@ -496,7 +495,7 @@
 
   <!-- ─── Project Info Card (Right) ─── -->
   <div class="card-panel-wrapper shrink-0 overflow-hidden transition-all duration-300 ease-out" style="width: {showProjectCard ? '20rem' : '0'}; height: min(600px, 80vh);">
-    <div class="project-card w-80 h-full flex flex-col bg-white rounded-3xl shadow-xl overflow-hidden transition-all duration-300 ease-out" style="opacity: {showProjectCard ? '1' : '0'}; transform: translateX({showProjectCard ? '0' : '2rem'});">
+    <div class="project-card w-80 h-full flex flex-col rounded-3xl overflow-hidden" style="opacity: {showProjectCard ? '1' : '0'}; transform: translateX({showProjectCard ? '0' : '2rem'});">
       <!-- Close button -->
       <button 
         class="absolute top-3 right-3 z-10 w-8 h-8 rounded-full bg-white/80 backdrop-blur flex items-center justify-center text-nord-3 hover:text-nord-0 hover:bg-white transition-all shadow-sm"
@@ -527,10 +526,10 @@
           <h3 class="text-xs text-nord-3 uppercase tracking-wider font-medium mb-2">Tech Stack</h3>
           <div class="flex flex-wrap gap-2">
             <!-- PLACEHOLDER: Add/modify tech badges -->
-            <span class="px-3 py-1 text-xs font-medium bg-nord-6 text-nord-0 rounded-full">Svelte 5</span>
-            <span class="px-3 py-1 text-xs font-medium bg-nord-6 text-nord-0 rounded-full">Tailwind CSS</span>
-            <span class="px-3 py-1 text-xs font-medium bg-nord-6 text-nord-0 rounded-full">DaisyUI</span>
-            <span class="px-3 py-1 text-xs font-medium bg-nord-6 text-nord-0 rounded-full">Local LLM</span>
+            <span class="aurora-pill aurora-red">Svelte 5</span>
+            <span class="aurora-pill aurora-orange">Tailwind CSS</span>
+            <span class="aurora-pill aurora-yellow">DaisyUI</span>
+            <span class="aurora-pill aurora-green">Local LLM</span>
           </div>
         </div>
 

@@ -46,6 +46,28 @@
   --radius-box: 1.5rem;
 }
 
+/* Nord Dark Theme (Polar Night) - similar to nordtheme.com */
+[data-theme="nord-dark"] {
+  --color-primary: #88C0D0;
+  --color-primary-content: #ECEFF4;
+  --color-secondary: #81A1C1;
+  --color-secondary-content: #ECEFF4;
+  --color-accent: #B48EAD;
+  --color-accent-content: #ECEFF4;
+  --color-neutral: #3B4252;
+  --color-neutral-content: #ECEFF4;
+  --color-base-100: #2E3440;
+  --color-base-200: #3B4252;
+  --color-base-300: #434C5E;
+  --color-base-content: #ECEFF4;
+  --color-info: #88C0D0;
+  --color-success: #A3BE8C;
+  --color-warning: #EBCB8B;
+  --color-error: #BF616A;
+  --radius-btn: 1.5rem;
+  --radius-box: 1.5rem;
+}
+
 html, body, #app {
   height: 100%;
   margin: 0;
@@ -54,6 +76,199 @@ html, body, #app {
 body {
   font-family: var(--font-sans);
   background: linear-gradient(135deg, #dde4ea 0%, #c8d5de 50%, #d8dee9 100%);
+  transition: background 0.4s ease;
+}
+
+/* Theme transition wrapper */
+.theme-wrapper {
+  transition: background 0.4s ease;
+}
+
+.theme-wrapper[data-theme="nord"] {
+  background: linear-gradient(135deg, #dde4ea 0%, #c8d5de 50%, #d8dee9 100%);
+}
+
+/* Dark mode background */
+.theme-wrapper[data-theme="nord-dark"] {
+  background: linear-gradient(135deg, #2E3440 0%, #3B4252 50%, #2E3440 100%);
+}
+
+/* ── Universal transition for theme changes ── */
+.chat-card,
+.character-card,
+.project-card,
+.chat-card *,
+.character-card *,
+.project-card * {
+  transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* ── Dark mode card styles ── */
+[data-theme="nord-dark"] .chat-card,
+[data-theme="nord-dark"] .character-card,
+[data-theme="nord-dark"] .project-card {
+  background: #3B4252;
+}
+
+[data-theme="nord-dark"] .chat-card {
+  box-shadow:
+    0 4px 6px -1px rgba(0, 0, 0, 0.3),
+    0 20px 50px -12px rgba(0, 0, 0, 0.5),
+    0 0 0 1px rgba(67, 76, 94, 0.8);
+}
+
+[data-theme="nord-dark"] .character-card,
+[data-theme="nord-dark"] .project-card {
+  box-shadow:
+    0 4px 6px -1px rgba(0, 0, 0, 0.2),
+    0 20px 50px -12px rgba(0, 0, 0, 0.4);
+}
+
+/* ── Dark mode text colors ── */
+[data-theme="nord-dark"] .text-nord-0 { color: #ECEFF4 !important; }
+[data-theme="nord-dark"] .text-nord-3 { color: #D8DEE9 !important; }
+[data-theme="nord-dark"] .text-white { color: #ECEFF4 !important; }
+
+/* ── Dark mode backgrounds ── */
+[data-theme="nord-dark"] .bg-white { background-color: #3B4252 !important; }
+[data-theme="nord-dark"] .bg-nord-6 { background-color: #434C5E !important; }
+[data-theme="nord-dark"] .bg-nord-5 { background-color: #4C566A !important; }
+
+/* ── Dark mode borders ── */
+[data-theme="nord-dark"] .border-nord-5 { border-color: #4C566A !important; }
+[data-theme="nord-dark"] .border-white { border-color: #434C5E !important; }
+
+/* ── Dark mode header icons ── */
+[data-theme="nord-dark"] .btn-ghost {
+  color: #D8DEE9;
+}
+
+[data-theme="nord-dark"] .btn-ghost:hover {
+  background-color: rgba(136, 192, 208, 0.15);
+  color: #88C0D0;
+}
+
+/* ── Dark mode avatar borders for depth ── */
+[data-theme="nord-dark"] .header-avatar {
+  box-shadow: 0 0 0 2px #4C566A, 0 0 0 4px rgba(136, 192, 208, 0.25);
+}
+
+[data-theme="nord-dark"] .status-indicator {
+  border-color: #3B4252 !important;
+  box-shadow: 0 0 6px rgba(163, 190, 140, 0.5);
+}
+
+/* Message avatars in dark mode */
+[data-theme="nord-dark"] .msg-enter img.rounded-full {
+  box-shadow: 0 0 0 1px #4C566A;
+}
+
+/* ── Dark mode input area ── */
+[data-theme="nord-dark"] .bg-nord-6.rounded-full {
+  background-color: #434C5E !important;
+  box-shadow: inset 0 0 0 1px #4C566A;
+}
+
+[data-theme="nord-dark"] textarea::placeholder {
+  color: rgba(216, 222, 233, 0.6) !important;
+}
+
+[data-theme="nord-dark"] textarea {
+  color: #ECEFF4 !important;
+}
+
+/* ── Dark mode send button ── */
+[data-theme="nord-dark"] .bg-nord-4\/60 {
+  background-color: rgba(67, 76, 94, 0.6) !important;
+}
+
+[data-theme="nord-dark"] .text-nord-3\/40 {
+  color: rgba(216, 222, 233, 0.4) !important;
+}
+
+/* ── Dark mode link buttons ── */
+[data-theme="nord-dark"] .hover\:bg-nord-5:hover {
+  background-color: #4C566A !important;
+}
+
+/* ── Dark mode scrollbar ── */
+[data-theme="nord-dark"] ::-webkit-scrollbar-thumb {
+  background: #4C566A;
+}
+
+[data-theme="nord-dark"] ::-webkit-scrollbar-thumb:hover {
+  background: #88C0D0;
+}
+
+/* ── Dark mode gradients ── */
+[data-theme="nord-dark"] .from-nord-8\/20 {
+  --tw-gradient-from: rgba(136, 192, 208, 0.15);
+}
+
+[data-theme="nord-dark"] .from-nord-9\/20 {
+  --tw-gradient-from: rgba(129, 161, 193, 0.15);
+}
+
+[data-theme="nord-dark"] .bg-nord-6\/50 {
+  background-color: rgba(67, 76, 94, 0.5) !important;
+}
+
+/* ── Dark mode close buttons ── */
+[data-theme="nord-dark"] .bg-white\/80 {
+  background-color: rgba(59, 66, 82, 0.9) !important;
+}
+
+[data-theme="nord-dark"] .hover\:bg-white:hover {
+  background-color: #434C5E !important;
+}
+
+/* Theme toggle animation */
+.theme-toggle {
+  color: #4C566A;
+}
+
+[data-theme="nord-dark"] .theme-toggle {
+  color: #D8DEE9;
+}
+
+.theme-icon-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.theme-icon {
+  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.2s ease;
+}
+
+.sun-icon {
+  animation: sunEnter 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.moon-icon {
+  animation: moonEnter 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes sunEnter {
+  from {
+    transform: rotate(-90deg) scale(0);
+    opacity: 0;
+  }
+  to {
+    transform: rotate(0deg) scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes moonEnter {
+  from {
+    transform: rotate(90deg) scale(0);
+    opacity: 0;
+  }
+  to {
+    transform: rotate(0deg) scale(1);
+    opacity: 1;
+  }
 }
 
 /* ── Chat card ── */
@@ -99,7 +314,45 @@ body {
 
 /* ── Info card panel wrapper (push animation) ── */
 .card-panel-wrapper {
-  /* Width transitions create the push effect */
+  transition: width 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  border-radius: 24px;
+}
+
+/* ── Profile flip animation ── */
+.profile-image-wrapper {
+  perspective: 1000px;
+  border: none;
+  background: linear-gradient(135deg, rgba(136, 192, 208, 0.3), rgba(129, 161, 193, 0.3));
+  box-shadow: 0 8px 32px rgba(136, 192, 208, 0.2);
+  transition: box-shadow 0.3s ease;
+}
+
+.profile-image-wrapper:hover {
+  box-shadow: 0 12px 40px rgba(136, 192, 208, 0.4);
+}
+
+.flipper {
+  position: relative;
+  transition: transform 0.6s;
+  transform-style: preserve-3d;
+}
+
+.profile-image-wrapper.flipped .flipper {
+  transform: rotateY(180deg);
+}
+
+.profile-face {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+  display: block;
+  backface-visibility: hidden;
+}
+
+.profile-back {
+  transform: rotateY(180deg);
 }
 
 /* ── Main chat card transition ── */
@@ -110,7 +363,19 @@ body {
     0 4px 6px -1px rgba(46, 52, 64, 0.05),
     0 20px 50px -12px rgba(46, 52, 64, 0.12),
     0 0 0 1px rgba(216, 222, 233, 0.5);
-  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: background-color 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+  overflow: hidden;
+}
+
+/* ── Character/Project card styles ── */
+.character-card,
+.project-card {
+  background: #ffffff;
+  border-radius: 24px;
+  box-shadow:
+    0 4px 6px -1px rgba(46, 52, 64, 0.05),
+    0 20px 50px -12px rgba(46, 52, 64, 0.15) !important;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease, opacity 0.3s ease, transform 0.3s ease;
 }
 
 /* ── 3D Cover photo card ── */
@@ -124,12 +389,24 @@ body {
   transition: transform 0.15s ease-out, box-shadow 0.3s ease;
   will-change: transform;
   transform: perspective(1000px) rotateX(0deg) rotateY(0deg);
+  box-shadow: 0 4px 15px rgba(46, 52, 64, 0.15);
 }
 
 .tilt-card:hover {
   box-shadow: 
     0 20px 40px -12px rgba(46, 52, 64, 0.35),
     0 0 0 1px rgba(46, 52, 64, 0.05);
+}
+
+/* Dark mode tilt card */
+[data-theme="nord-dark"] .tilt-card {
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3), 0 0 0 2px rgba(136, 192, 208, 0.2);
+}
+
+[data-theme="nord-dark"] .tilt-card:hover {
+  box-shadow: 
+    0 20px 40px -12px rgba(0, 0, 0, 0.5),
+    0 0 0 2px rgba(136, 192, 208, 0.4);
 }
 
 /* Lightbox 3D card (cursor-following) */
@@ -147,15 +424,6 @@ body {
   box-shadow: 
     0 35px 60px -15px rgba(0, 0, 0, 0.5),
     0 0 0 1px rgba(255, 255, 255, 0.1);
-}
-
-/* ── Character/Project card styles ── */
-.character-card,
-.project-card {
-  box-shadow:
-    0 4px 6px -1px rgba(46, 52, 64, 0.05),
-    0 20px 50px -12px rgba(46, 52, 64, 0.15),
-    0 0 0 1px rgba(216, 222, 233, 0.5);
 }
 
 /* ── Lightbox ── */
@@ -193,4 +461,131 @@ body {
 
 .lightbox-card-closing {
   animation: lightboxScaleOut 0.25s cubic-bezier(0.4, 0, 1, 1) forwards;
+}
+
+/* ── Aurora Pills (Nord Aurora palette) ── */
+.aurora-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border-radius: 50px;
+  transition: all 0.3s ease;
+  cursor: default;
+  border: 2px solid transparent;
+  white-space: nowrap;
+}
+
+/* Aurora Red (nord-11: #BF616A) */
+.aurora-red {
+  background: rgba(191, 97, 106, 0.12);
+  color: #BF616A;
+  border-color: rgba(191, 97, 106, 0.25);
+  box-shadow: 0 2px 8px rgba(191, 97, 106, 0.15);
+}
+
+.aurora-red:hover {
+  background: rgba(191, 97, 106, 0.2);
+  box-shadow: 0 4px 12px rgba(191, 97, 106, 0.3);
+}
+
+/* Aurora Orange (nord-12: #D08770) */
+.aurora-orange {
+  background: rgba(208, 135, 112, 0.12);
+  color: #D08770;
+  border-color: rgba(208, 135, 112, 0.25);
+  box-shadow: 0 2px 8px rgba(208, 135, 112, 0.15);
+}
+
+.aurora-orange:hover {
+  background: rgba(208, 135, 112, 0.2);
+  box-shadow: 0 4px 12px rgba(208, 135, 112, 0.3);
+}
+
+/* Aurora Yellow (nord-13: #EBCB8B) */
+.aurora-yellow {
+  background: rgba(235, 203, 139, 0.12);
+  color: #c9a227;
+  border-color: rgba(235, 203, 139, 0.25);
+  box-shadow: 0 2px 8px rgba(235, 203, 139, 0.15);
+}
+
+.aurora-yellow:hover {
+  background: rgba(235, 203, 139, 0.2);
+  box-shadow: 0 4px 12px rgba(235, 203, 139, 0.3);
+}
+
+/* Aurora Green (nord-14: #A3BE8C) */
+.aurora-green {
+  background: rgba(163, 190, 140, 0.12);
+  color: #A3BE8C;
+  border-color: rgba(163, 190, 140, 0.25);
+  box-shadow: 0 2px 8px rgba(163, 190, 140, 0.15);
+}
+
+.aurora-green:hover {
+  background: rgba(163, 190, 140, 0.2);
+  box-shadow: 0 4px 12px rgba(163, 190, 140, 0.3);
+}
+
+/* Aurora Purple (nord-15: #B48EAD) */
+.aurora-purple {
+  background: rgba(180, 142, 173, 0.12);
+  color: #B48EAD;
+  border-color: rgba(180, 142, 173, 0.25);
+  box-shadow: 0 2px 8px rgba(180, 142, 173, 0.15);
+}
+
+.aurora-purple:hover {
+  background: rgba(180, 142, 173, 0.2);
+  box-shadow: 0 4px 12px rgba(180, 142, 173, 0.3);
+}
+
+/* Dark mode aurora pills - brighter and more vibrant */
+[data-theme="nord-dark"] .aurora-red {
+  background: rgba(191, 97, 106, 0.25);
+  border-color: rgba(191, 97, 106, 0.5);
+  box-shadow: 0 2px 12px rgba(191, 97, 106, 0.3);
+}
+
+[data-theme="nord-dark"] .aurora-orange {
+  background: rgba(208, 135, 112, 0.25);
+  border-color: rgba(208, 135, 112, 0.5);
+  box-shadow: 0 2px 12px rgba(208, 135, 112, 0.3);
+}
+
+[data-theme="nord-dark"] .aurora-yellow {
+  background: rgba(235, 203, 139, 0.25);
+  color: #EBCB8B;
+  border-color: rgba(235, 203, 139, 0.5);
+  box-shadow: 0 2px 12px rgba(235, 203, 139, 0.3);
+}
+
+[data-theme="nord-dark"] .aurora-green {
+  background: rgba(163, 190, 140, 0.25);
+  border-color: rgba(163, 190, 140, 0.5);
+  box-shadow: 0 2px 12px rgba(163, 190, 140, 0.3);
+}
+
+[data-theme="nord-dark"] .aurora-purple {
+  background: rgba(180, 142, 173, 0.25);
+  border-color: rgba(180, 142, 173, 0.5);
+  box-shadow: 0 2px 12px rgba(180, 142, 173, 0.3);
+}
+
+/* ── Dark mode aurora accents for UI elements ── */
+[data-theme="nord-dark"] .profile-image-wrapper {
+  background: linear-gradient(135deg, rgba(136, 192, 208, 0.3), rgba(180, 142, 173, 0.3));
+  box-shadow: 0 8px 32px rgba(136, 192, 208, 0.3), 0 0 0 2px rgba(136, 192, 208, 0.2);
+}
+
+[data-theme="nord-dark"] .tilt-card {
+  box-shadow: 0 0 0 2px rgba(136, 192, 208, 0.3);
+}
+
+/* Aurora glow on status indicator in dark mode */
+[data-theme="nord-dark"] .bg-nord-14 {
+  box-shadow: 0 0 8px rgba(163, 190, 140, 0.6);
 }
