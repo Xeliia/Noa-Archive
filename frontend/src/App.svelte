@@ -2,7 +2,10 @@
   import { tick } from 'svelte'
   import { Send, Trash, Info, X, Github, ExternalLink, Cake, Sun, Moon, Eye, Pen, Book } from 'lucide-svelte';
 
-  const SYSTEM_PROMPT = `You are a helpful, warm AI assistant named Ushio Noa. Keep responses concise and conversational.`
+  // ── API Configuration ──
+  // Change this to your ngrok URL when using remote access
+  const API_URL = 'http://localhost:8000'
+  const API_KEY = 'changeme'  // Must match backend .env API_KEY
 
   /* ── Theme state ── */
   let isDark = $state(false)
@@ -143,25 +146,85 @@
     loading = true
     await scrollToBottom()
 
+    // Create placeholder for streaming response
+    const assistantMsgId = Date.now() + 1
+    const assistantMsg = { id: assistantMsgId, role: 'assistant', content: '', time: new Date(), type: 'text' }
+    messages = [...messages, assistantMsg]
+
     try {
       const history = messages
-        .filter(m => m.type === 'text' && m.content)
+        .filter(m => m.type === 'text' && m.content && m.id !== assistantMsgId)
         .map(m => ({ role: m.role, content: m.content }))
-      const res = await fetch('https://api.anthropic.com/v1/messages', {
+      
+      const res = await fetch(`${API_URL}/chat`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${API_KEY}`
+        },
         body: JSON.stringify({
-          model: 'claude-sonnet-4-20250514',
-          max_tokens: 1000,
-          system: SYSTEM_PROMPT,
           messages: history,
+          stream: true
         }),
       })
-      const data = await res.json()
-      const reply = data.content?.map(b => b.text).join('') ?? "Sorry, I couldn't respond."
-      messages = [...messages, { id: Date.now() + 1, role: 'assistant', content: reply, time: new Date(), type: 'text' }]
+
+      if (!res.ok) {
+        throw new Error(`HTTP ${res.status}`)
+      }
+
+      // Handle streaming response (SSE)
+      const reader = res.body.getReader()
+      const decoder = new TextDecoder()
+      let accumulated = ''
+
+      while (true) {
+        const { done, value } = await reader.read()
+        if (done) break
+
+        const chunk = decoder.decode(value, { stream: true })
+        const lines = chunk.split('\n')
+
+        for (const line of lines) {
+          if (line.startsWith('data: ')) {
+            const data = line.slice(6)
+            if (data.trim() === '[DONE]') continue
+
+            try {
+              const parsed = JSON.parse(data)
+              if (parsed.error) {
+                accumulated = parsed.error
+              } else if (parsed.content) {
+                accumulated += parsed.content
+                // Update the message reactively
+                messages = messages.map(m => 
+                  m.id === assistantMsgId 
+                    ? { ...m, content: accumulated }
+                    : m
+                )
+                await scrollToBottom()
+              }
+            } catch (e) {
+              // Skip invalid JSON
+            }
+          }
+        }
+      }
+
+      // Ensure final update
+      if (!accumulated) {
+        accumulated = "Sorry, I couldn't respond."
+      }
+      messages = messages.map(m => 
+        m.id === assistantMsgId 
+          ? { ...m, content: accumulated }
+          : m
+      )
     } catch {
-      messages = [...messages, { id: Date.now() + 1, role: 'assistant', content: 'Something went wrong. Please try again.', time: new Date(), type: 'text' }]
+      messages = messages.map(m => 
+        m.id === assistantMsgId 
+          ? { ...m, content: 'Something went wrong. Please try again.' }
+          : m
+      )
     } finally {
       loading = false
       await scrollToBottom()
