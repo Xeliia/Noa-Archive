@@ -1,14 +1,14 @@
-# AI Chat — Svelte + DaisyUI 5
+# Frontend — Noa Chat UI
 
-A clean, minimal AI chat interface built with Svelte 5, Vite, Tailwind CSS v4, and DaisyUI 5.
+Messenger-style chat interface built with Svelte 5, Tailwind CSS 4, and DaisyUI 5. Features a Nord color theme with light/dark mode.
 
 ## Stack
 
 - **Svelte 5** — runes-based reactivity (`$state`, `$derived`)
-- **Vite 6** — lightning-fast dev server & build
-- **Tailwind CSS v4** — CSS-first config via `@theme`
-- **DaisyUI 5** — component classes (btn, card, avatar, chat-bubble, etc.)
-- **Anthropic API** — connected to `claude-sonnet-4-20250514`
+- **Vite 6** — dev server & build
+- **Tailwind CSS 4** — CSS-first config via `@theme`
+- **DaisyUI 5** — component utility classes
+- **Lucide Svelte** — icons
 
 ## Getting Started
 
@@ -17,32 +17,53 @@ npm install
 npm run dev
 ```
 
-Then open http://localhost:5173
+Open http://localhost:5173
 
-## Build for production
+## Build
 
 ```bash
 npm run build
 npm run preview
 ```
 
+## Configuration
+
+Create a `.env` file:
+
+```env
+VITE_API_URL=http://localhost:8000
+VITE_API_KEY=changeme
+```
+
+`VITE_API_KEY` must match the `API_KEY` in the root `.env`.
+
 ## Project Structure
 
 ```
-ai-chat/
+frontend/
 ├── index.html
 ├── vite.config.js
 ├── postcss.config.js
 ├── package.json
+├── .env                # API URL + key
 └── src/
-    ├── main.js        # Svelte mount
-    ├── app.css        # Tailwind + DaisyUI + custom theme
-    └── App.svelte     # Main chat component (all logic lives here)
+    ├── main.js         # Svelte mount
+    ├── app.css         # Nord theme, animations, dark mode
+    ├── App.svelte      # Chat UI (all logic)
+    └── assets/
+        ├── mini-profile.png    # Noa avatar
+        ├── mini-profile2.png   # Noa avatar (back)
+        ├── cover-photo.jpg     # Character card cover
+        └── momochat.ico        # Favicon
 ```
 
-## Notes
+## UI Features
 
-- Svelte 5 runes syntax is used throughout (`$state`, `tick`)  
-- The custom `forest-chat` DaisyUI theme is defined in `app.css` via CSS variables
-- Tailwind v4 uses `@theme` instead of `tailwind.config.js` — no config file needed
-- The Anthropic API key is handled by the proxy — no key needed in client code
+- **Progressive streaming** — paragraphs appear as separate bubbles in real-time
+- **Stop button** — cancel generation mid-response with in-character interruption
+- **Typing indicator** — bouncing dots while Noa is generating
+- **Character card** — flippable avatar, cover photo with 3D tilt effect, birthday badge
+- **Project info card** — tech stack, credits, links
+- **Theme toggle** — Nord light/dark mode
+- **Message presets** — randomized greeting messages on load/clear
+- **Auto-resize textarea** — grows with input, submits on Enter
