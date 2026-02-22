@@ -1,5 +1,5 @@
 import os
-from pydantic_settings import BaseSettings
+from pydantic_settings import BaseSettings, SettingsConfigDict
 from functools import lru_cache
 from enum import Enum
 from typing import Literal, Optional
@@ -16,6 +16,11 @@ DEFAULT_SYSTEM_PROMPT = """You are Ushio Noa, a warm and intelligent AI assistan
 
 
 class Settings(BaseSettings):
+    model_config = SettingsConfigDict(
+        env_file=Path(__file__).resolve().parent.parent / ".env",
+        env_file_encoding="utf-8",
+    )
+
     # LLM Backend Configuration
     # Backend type: "ollama" or "llamacpp"
     llm_backend_type: LLMBackendType = LLMBackendType.OLLAMA
@@ -43,7 +48,7 @@ class Settings(BaseSettings):
     
     # Generation parameters (tune for your model)
     temperature: float = 0.8  # Higher = more creative, lower = more focused
-    max_tokens: int = 256  # Keep low for weak models to avoid gibberish
+    max_tokens: int = 512  # Keep low for weak models to avoid gibberish
     top_p: float = 0.9
     repeat_penalty: float = 1.1  # Helps prevent repetition on weak models
     
@@ -77,10 +82,6 @@ class Settings(BaseSettings):
             return f"{base}/v1/models"
         else:  # llamacpp
             return f"{base}/v1/models"
-
-    class Config:
-        env_file = ".env"
-        env_file_encoding = "utf-8"
 
 
 @lru_cache()
