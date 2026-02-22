@@ -99,16 +99,19 @@ body {
 .chat-card,
 .character-card,
 .project-card,
+.history-card,
 .chat-card *,
 .character-card *,
-.project-card * {
+.project-card *,
+.history-card * {
   transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
 }
 
 /* ── Dark mode card styles ── */
 [data-theme="nord-dark"] .chat-card,
 [data-theme="nord-dark"] .character-card,
-[data-theme="nord-dark"] .project-card {
+[data-theme="nord-dark"] .project-card,
+[data-theme="nord-dark"] .history-card {
   background: #3B4252;
 }
 
@@ -120,10 +123,14 @@ body {
 }
 
 [data-theme="nord-dark"] .character-card,
-[data-theme="nord-dark"] .project-card {
+[data-theme="nord-dark"] .project-card,
+[data-theme="nord-dark"] .history-card {
   box-shadow:
-    0 4px 6px -1px rgba(0, 0, 0, 0.2),
-    0 20px 50px -12px rgba(0, 0, 0, 0.4);
+    0 4px 6px -1px rgba(0, 0, 0, 0.3),
+    0 20px 50px -12px rgba(0, 0, 0, 0.5),
+    0 0 0 1px rgba(67, 76, 94, 0.8),
+    0 0 40px -10px rgba(136, 192, 208, 0.12),
+    0 0 80px -20px rgba(180, 142, 173, 0.08);
 }
 
 /* ── Dark mode text colors ── */
@@ -133,7 +140,7 @@ body {
 [data-theme="nord-dark"] .text-white { color: #ECEFF4 !important; }
 
 /* ── Dark mode backgrounds ── */
-[data-theme="nord-dark"] .bg-white { background-color: #3B4252 !important; }
+[data-theme="nord-dark"] .bg-white { background-color: #2E3440 !important; }
 [data-theme="nord-dark"] .bg-nord-6 { background-color: #434C5E !important; }
 [data-theme="nord-dark"] .bg-nord-5 { background-color: #4C566A !important; }
 
@@ -183,7 +190,7 @@ body {
 
 /* ── Dark mode input area ── */
 [data-theme="nord-dark"] .bg-nord-6.rounded-full {
-  background-color: #434C5E !important;
+  background-color: #3B4252 !important;
   box-shadow: inset 0 0 0 1px #4C566A;
 }
 
@@ -218,14 +225,7 @@ body {
   background: #88C0D0;
 }
 
-/* ── Dark mode gradients ── */
-[data-theme="nord-dark"] .from-nord-8\/20 {
-  --tw-gradient-from: rgba(136, 192, 208, 0.15);
-}
 
-[data-theme="nord-dark"] .from-nord-9\/20 {
-  --tw-gradient-from: rgba(129, 161, 193, 0.15);
-}
 
 [data-theme="nord-dark"] .bg-nord-6\/50 {
   background-color: rgba(67, 76, 94, 0.5) !important;
@@ -297,6 +297,34 @@ body {
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: #D8DEE9; border-radius: 4px; }
 ::-webkit-scrollbar-thumb:hover { background: #81A1C1; }
+
+/* ── Message bubble styles ── */
+
+/* User (Sensei) bubble */
+.msg-bubble-user {
+  color: #2E3440;
+  background-color: #88C0D0;
+}
+
+/* Assistant (Noa) bubble — light mode */
+.msg-bubble-noa {
+  background-color: #2E3440;
+  color: #ECEFF4;
+}
+
+/* Assistant (Noa) bubble — dark mode: lighter bg to pop against dark chat area */
+[data-theme="nord-dark"] .msg-bubble-noa {
+  background-color: #434C5E;
+  color: #ECEFF4;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(76, 86, 106, 0.5);
+}
+
+/* User (Sensei) bubble — dark mode: subtle glow for definition */
+[data-theme="nord-dark"] .msg-bubble-user {
+  background-color: #88C0D0;
+  color: #2E3440;
+  box-shadow: 0 1px 4px rgba(136, 192, 208, 0.3);
+}
 
 /* ── Waveform bars ── */
 .waveform-bar {
@@ -386,16 +414,58 @@ body {
   min-width: 320px;
 }
 
-/* ── Character/Project card styles ── */
+/* ── Character/Project/History card styles ── */
 .character-card,
-.project-card {
+.project-card,
+.history-card {
   background: #ffffff;
   border-radius: 24px;
   box-shadow:
     0 4px 6px -1px rgba(46, 52, 64, 0.05),
-    0 20px 50px -12px rgba(46, 52, 64, 0.15) !important;
+    0 20px 50px -12px rgba(46, 52, 64, 0.12),
+    0 0 0 1px rgba(216, 222, 233, 0.5);
   transition: background-color 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease, opacity 0.3s ease, transform 0.3s ease;
 }
+
+/* ── History item styles ── */
+.history-item {
+  background: transparent;
+}
+
+.history-item:hover {
+  background-color: rgba(216, 222, 233, 0.5);
+}
+
+.history-item-active {
+  background-color: rgba(136, 192, 208, 0.12);
+}
+
+.history-item-active:hover {
+  background-color: rgba(136, 192, 208, 0.2);
+}
+
+[data-theme="nord-dark"] .history-item:hover {
+  background-color: rgba(76, 86, 106, 0.5);
+}
+
+[data-theme="nord-dark"] .history-item-active {
+  background-color: rgba(136, 192, 208, 0.1);
+}
+
+[data-theme="nord-dark"] .history-item-active:hover {
+  background-color: rgba(136, 192, 208, 0.18);
+}
+
+/* ── History icon colors ── */
+/* Light mode: subtle neutral */
+.history-icon { color: rgba(76, 86, 106, 0.6); }
+
+/* Dark mode: cycle through Aurora colors */
+[data-theme="nord-dark"] .history-icon-0 { color: #BF616A; } /* Red */
+[data-theme="nord-dark"] .history-icon-1 { color: #D08770; } /* Orange */
+[data-theme="nord-dark"] .history-icon-2 { color: #EBCB8B; } /* Yellow */
+[data-theme="nord-dark"] .history-icon-3 { color: #A3BE8C; } /* Green */
+[data-theme="nord-dark"] .history-icon-4 { color: #B48EAD; } /* Purple */
 
 /* ── 3D Cover photo card ── */
 .perspective-1000 {
@@ -682,6 +752,19 @@ body {
     border-radius: 0 !important;
   }
 
+  /* History card */
+  .card-panel-wrapper:has(.history-card) {
+    right: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  .card-panel-wrapper:has(.history-card) .history-card {
+    width: 100% !important;
+    max-width: 100% !important;
+    border-radius: 0 !important;
+  }
+
   /* Adjust header padding */
   .chat-card .flex.items-center.gap-3.px-6 {
     padding-left: 1rem !important;
@@ -740,6 +823,12 @@ body {
     width: 20rem !important;
   }
 
+  .card-panel-wrapper:has(.history-card) {
+    right: 2rem !important;
+    left: auto !important;
+    width: 22rem !important;
+  }
+
   .character-card {
     width: 22rem !important;
     height: auto !important;
@@ -748,6 +837,12 @@ body {
 
   .project-card {
     width: 20rem !important;
+    height: auto !important;
+    max-height: 85vh !important;
+  }
+
+  .history-card {
+    width: 22rem !important;
     height: auto !important;
     max-height: 85vh !important;
   }
