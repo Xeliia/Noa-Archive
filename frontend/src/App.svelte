@@ -1,6 +1,6 @@
 <script>
   import { tick } from 'svelte'
-  import { Send, Trash, Info, X, Github, ExternalLink, Cake, Sun, Moon, Eye, Pen, Book, CircleStop } from 'lucide-svelte';
+  import { Send, Trash, Info, X, Github, ExternalLink, Cake, Sun, Moon, Eye, Pen, Book, CircleStop, History, MessageSquare, Trash2 } from 'lucide-svelte';
 
   // ── API Configuration ──
   const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:8000'
@@ -16,6 +16,7 @@
   /* ── Card panel states ── */
   let showCharacterCard = $state(false)
   let showProjectCard = $state(false)
+  let showHistoryPanel = $state(false)
   let showLightbox = $state(false)
   
   /* ── Profile flip state ── */
@@ -94,6 +95,111 @@
   let textareaEl = $state(null)
   let abortController = $state(null)
 
+  /* ── Chat History (localStorage) ── */
+  const HISTORY_KEY = 'noa-chat-history'
+  const CURRENT_CHAT_KEY = 'noa-current-chat'
+  const MAX_HISTORY = 50
+
+  let chatHistory = $state(loadHistory())
+  let currentChatId = $state(null)
+
+  function loadHistory() {
+    try {
+      const raw = localStorage.getItem(HISTORY_KEY)
+      return raw ? JSON.parse(raw) : []
+    } catch { return [] }
+  }
+
+  function saveHistory() {
+    try {
+      localStorage.setItem(HISTORY_KEY, JSON.stringify(chatHistory.slice(0, MAX_HISTORY)))
+    } catch { /* storage full — silently fail */ }
+  }
+
+  function getChatTitle(msgs) {
+    const firstUser = msgs.find(m => m.role === 'user' && m.type === 'text')
+    if (firstUser) {
+      const text = firstUser.content.trim()
+      return text.length > 50 ? text.slice(0, 50) + '…' : text
+    }
+    return 'New conversation'
+  }
+
+  function hasUserMessages(msgs) {
+    return msgs.some(m => m.role === 'user' && m.type === 'text')
+  }
+
+  function saveCurrentChat() {
+    if (!hasUserMessages(messages)) return // don't save preset-only chats
+    
+    const chatEntry = {
+      id: currentChatId ?? Date.now().toString(),
+      title: getChatTitle(messages),
+      messages: messages.map(m => ({
+        ...m,
+        time: m.time instanceof Date ? m.time.toISOString() : m.time
+      })),
+      createdAt: new Date().toISOString(),
+      lastMessageAt: new Date().toISOString()
+    }
+
+    // Update existing or prepend new
+    const existingIdx = chatHistory.findIndex(c => c.id === chatEntry.id)
+    if (existingIdx >= 0) {
+      chatHistory[existingIdx] = chatEntry
+    } else {
+      chatHistory = [chatEntry, ...chatHistory]
+    }
+    currentChatId = chatEntry.id
+    saveHistory()
+  }
+
+  function loadChat(chat) {
+    // Save current conversation first
+    saveCurrentChat()
+    
+    // Load the selected conversation
+    messages = chat.messages.map(m => ({
+      ...m,
+      time: new Date(m.time)
+    }))
+    currentChatId = chat.id
+    showHistoryPanel = false
+    input = ''
+    loading = false
+    if (abortController) {
+      abortController.abort()
+      abortController = null
+    }
+  }
+
+  function deleteChat(chatId) {
+    chatHistory = chatHistory.filter(c => c.id !== chatId)
+    if (currentChatId === chatId) currentChatId = null
+    saveHistory()
+  }
+
+  function clearAllHistory() {
+    chatHistory = []
+    currentChatId = null
+    saveHistory()
+  }
+
+  function formatHistoryDate(isoString) {
+    const date = new Date(isoString)
+    const now = new Date()
+    const diffMs = now - date
+    const diffMins = Math.floor(diffMs / 60000)
+    const diffHours = Math.floor(diffMs / 3600000)
+    const diffDays = Math.floor(diffMs / 86400000)
+
+    if (diffMins < 1) return 'Just now'
+    if (diffMins < 60) return `${diffMins}m ago`
+    if (diffHours < 24) return `${diffHours}h ago`
+    if (diffDays < 7) return `${diffDays}d ago`
+    return date.toLocaleDateString([], { month: 'short', day: 'numeric' })
+  }
+
   /* ── Interrupt Presets ── */
   const INTERRUPT_RESPONSES = [
     "Sensei... it's rather rude to interrupt someone mid-sentence, don't you think?",
@@ -144,6 +250,9 @@
       abortController.abort()
       abortController = null
     }
+    // Save current conversation to history before clearing
+    saveCurrentChat()
+    currentChatId = null
     messages = getRandomPreset()
     input = ''
     loading = false
@@ -199,13 +308,17 @@
       const reader = res.body.getReader()
       const decoder = new TextDecoder()
       let currentParagraph = ''
+      let lineBuffer = ''  // Buffer for incomplete SSE lines across chunks
+      const pendingBubbles = []  // Collect paragraphs for delayed display
 
       while (true) {
         const { done, value } = await reader.read()
         if (done) break
 
-        const chunk = decoder.decode(value, { stream: true })
-        const lines = chunk.split('\n')
+        lineBuffer += decoder.decode(value, { stream: true })
+        const lines = lineBuffer.split('\n')
+        // Keep the last element — it may be an incomplete line
+        lineBuffer = lines.pop() ?? ''
 
         for (const line of lines) {
           if (line.startsWith('data: ')) {
@@ -224,16 +337,7 @@
                 while (parts.length > 1) {
                   const completedParagraph = parts.shift().trim()
                   if (completedParagraph) {
-                    // Add completed paragraph as a new bubble
-                    const bubbleId = baseId + paragraphCount++
-                    messages = [...messages, {
-                      id: bubbleId,
-                      role: 'assistant',
-                      content: completedParagraph,
-                      time: new Date(),
-                      type: 'text'
-                    }]
-                    await scrollToBottom()
+                    pendingBubbles.push(completedParagraph)
                   }
                   currentParagraph = parts.join('\n\n')
                 }
@@ -245,17 +349,42 @@
         }
       }
 
-      // Add any remaining text as final bubble
+      // Process any remaining data left in the line buffer
+      if (lineBuffer.trim()) {
+        const line = lineBuffer.trim()
+        if (line.startsWith('data: ')) {
+          const data = line.slice(6)
+          if (data.trim() !== '[DONE]') {
+            try {
+              const parsed = JSON.parse(data)
+              if (parsed.content) currentParagraph += parsed.content
+            } catch (e) { /* skip */ }
+          }
+        }
+      }
+
+      // Add any remaining text as final paragraph
       const remaining = currentParagraph.trim()
       if (remaining) {
+        pendingBubbles.push(remaining)
+      }
+
+      // Display bubbles with natural typing delay between them
+      for (let i = 0; i < pendingBubbles.length; i++) {
+        // Add typing delay between bubbles (1.5-2.5s), skip the first one
+        if (i > 0) {
+          const delay = 1500 + Math.random() * 1000
+          await new Promise(r => setTimeout(r, delay))
+        }
         const bubbleId = baseId + paragraphCount++
         messages = [...messages, {
           id: bubbleId,
           role: 'assistant',
-          content: remaining,
+          content: pendingBubbles[i],
           time: new Date(),
           type: 'text'
         }]
+        await scrollToBottom()
       }
 
       // If nothing was generated at all
@@ -293,6 +422,8 @@
       loading = false
       abortController = null
       await scrollToBottom()
+      // Auto-save conversation after each exchange
+      saveCurrentChat()
     }
   }
 
@@ -324,13 +455,14 @@
   function closeAllPanels() {
     showCharacterCard = false
     showProjectCard = false
+    showHistoryPanel = false
   }
 </script>
 
 <!-- Mobile/Tablet overlay backdrop -->
 <!-- svelte-ignore a11y_no_static_element_interactions -->
 <div 
-  class="mobile-overlay lg:hidden {showCharacterCard || showProjectCard ? 'active' : ''}"
+  class="mobile-overlay lg:hidden {showCharacterCard || showProjectCard || showHistoryPanel ? 'active' : ''}"
   onclick={closeAllPanels}
   onkeydown={(e) => e.key === 'Escape' && closeAllPanels()}
   role="presentation"
@@ -350,7 +482,7 @@
       </button>
 
       <!-- Profile section -->
-      <div class="flex flex-col items-center pt-8 pb-6 px-6 bg-gradient-to-b from-nord-8/20 to-transparent">
+      <div class="flex flex-col items-center pt-8 pb-6 px-6">
         <!-- Avatar (flippable) -->
         <div class="relative mb-4">
           <button 
@@ -366,7 +498,7 @@
         </div>
 
         <!-- Name -->
-        <h2 class="text-xl font-semibold text-nord-0 mb-1">Noa</h2>
+        <h2 class="text-xl font-semibold text-nord-0 mb-1">Ushio Noa</h2>
         <p class="text-sm text-nord-3 italic mb-4">The Melancholy of Kivotos</p>
 
         <!-- Birthday badge -->
@@ -412,6 +544,7 @@
         onclick={() => { 
           showCharacterCard = !showCharacterCard
           showProjectCard = false
+          showHistoryPanel = false
         }}
       >
         <img src="/src/assets/mini-profile.png" alt="Ushio Noa" class="header-avatar w-11 h-11 rounded-full object-cover shadow-sm transition-transform group-hover:scale-105" />
@@ -450,10 +583,23 @@
           onclick={() => { 
             showProjectCard = !showProjectCard
             showCharacterCard = false
+            showHistoryPanel = false
           }}
           title="Project Info"
         >
           <Info size={18} />
+        </button>
+        <!-- History -->
+        <button 
+          class="btn btn-ghost btn-sm btn-square text-nord-3 hover:text-nord-0 transition-colors"
+          onclick={() => {
+            showHistoryPanel = !showHistoryPanel
+            showCharacterCard = false
+            showProjectCard = false
+          }}
+          title="Chat History"
+        >
+          <History size={18} />
         </button>
         <!-- Clear chat -->
         <button class="btn btn-ghost btn-sm btn-square text-nord-11 hover:bg-nord-11/10 transition-colors" onclick={clearChat} title="Clear chat">
@@ -472,7 +618,7 @@
           {#if msg.role === 'user'}
             <!-- User message (right-aligned, no avatar) -->
             <div class="msg-enter flex flex-col items-end">
-              <div class="max-w-[78%] px-4 py-2.5 text-sm leading-relaxed whitespace-pre-wrap bg-[#88C0D0] text-white rounded-[18px] rounded-br-[4px]">
+              <div class="msg-bubble-user max-w-[78%] px-4 py-2.5 text-sm leading-relaxed whitespace-pre-wrap rounded-[18px] rounded-br-[4px]">
                 {msg.content}
               </div>
               <!-- Time and Seen indicator -->
@@ -499,7 +645,7 @@
               {/if}
               
               <div class="flex flex-col items-start">
-                <div class="max-w-[78%] px-4 py-2.5 text-sm leading-relaxed whitespace-pre-wrap bg-nord-0 text-white rounded-[18px] rounded-bl-[4px]">
+                <div class="msg-bubble-noa max-w-[78%] px-4 py-2.5 text-sm leading-relaxed whitespace-pre-wrap rounded-[18px] rounded-bl-[4px]">
                   {msg.content}
                 </div>
                 {#if shouldShowTime(i)}
@@ -522,7 +668,7 @@
             
             <div class="flex flex-col items-start max-w-[85%]">
             <!-- Text bubble -->
-            <div class="bg-nord-0 text-white rounded-[18px] rounded-bl-[4px] px-4 py-2.5 text-sm leading-relaxed w-full">
+            <div class="msg-bubble-noa rounded-[18px] rounded-bl-[4px] px-4 py-2.5 text-sm leading-relaxed w-full">
               {msg.content}
             </div>
 
@@ -590,7 +736,7 @@
         <div class="msg-enter flex gap-2 items-end">
           <img src="/src/assets/mini-profile.png" alt="Ushio Noa" class="w-7 h-7 rounded-full object-cover shrink-0" />
           <div class="flex flex-col items-start">
-            <div class="bg-nord-0 rounded-[18px] rounded-bl-[4px] px-4 py-3">
+            <div class="msg-bubble-noa rounded-[18px] rounded-bl-[4px] px-4 py-3">
               <div class="flex gap-1 items-center">
                 {#each [0, 1, 2] as i}
                   <span class="dot-bounce block w-2 h-2 rounded-full bg-white/70"
@@ -607,7 +753,7 @@
     </div>
 
     <!-- ─── Input Area ─── -->
-    <div class="px-5 py-4 border-t border-nord-5 bg-white rounded-b-[24px]">
+    <div class="px-5 py-4 border-t border-nord-5 rounded-b-[24px]">
       <div class="flex items-center gap-2 bg-nord-6 rounded-full px-4 py-1.5 transition-all duration-200 focus-within:ring-2 focus-within:ring-nord-8/30">
 
         <!-- Input -->
@@ -661,7 +807,7 @@
       </button>
 
       <!-- Header -->
-      <div class="px-6 pt-8 pb-6 bg-gradient-to-b from-nord-9/20 to-transparent">
+      <div class="px-6 pt-8 pb-6">
         <h2 class="text-xl font-semibold text-nord-0 mb-1">About This Project</h2>
         <p class="text-sm text-nord-3">Noa AI Chatbot</p>
       </div>
@@ -697,7 +843,7 @@
           <p class="text-sm text-nord-0 leading-relaxed">
             <!-- PLACEHOLDER: Add future plans -->
             - Add support for image and audio messages<br>
-            - Add support for Cloud LLMs and API-based models<br>
+            - Add support for Cloud LLMs and API-based models (Currently only supports OpenAI and Gemini Models)<br>
           </p>
         </div>
 
@@ -736,6 +882,83 @@
           Version 1.0.0 • Made with ♥
         </p>
       </div>
+    </div>
+  </div>
+
+  <!-- ─── Chat History Panel (Right, after Project) ─── -->
+  <div class="card-panel-wrapper shrink-0 overflow-hidden transition-all duration-300 ease-out {showHistoryPanel ? '' : 'max-lg:pointer-events-none'}" style="width: {showHistoryPanel ? '22rem' : '0'}; height: min(700px, 85vh);">
+    <div class="history-card w-[22rem] h-full flex flex-col rounded-3xl overflow-hidden" style="opacity: {showHistoryPanel ? '1' : '0'}; transform: translateX({showHistoryPanel ? '0' : '-100%'});">
+      <!-- Close button -->
+      <button 
+        class="absolute top-3 right-3 z-10 w-8 h-8 rounded-full bg-white/80 backdrop-blur flex items-center justify-center text-nord-3 hover:text-nord-0 hover:bg-white transition-all shadow-sm cursor-pointer"
+        onclick={() => showHistoryPanel = false}
+      >
+        <X size={16} />
+      </button>
+
+      <!-- Header -->
+      <div class="px-6 pt-8 pb-4">
+        <div class="flex items-center gap-2 mb-1">
+          <History size={20} class="text-nord-0" />
+          <h2 class="text-xl font-semibold text-nord-0">Chat History</h2>
+        </div>
+        <p class="text-sm text-nord-3">{chatHistory.length} saved conversation{chatHistory.length !== 1 ? 's' : ''}</p>
+      </div>
+
+      <!-- Divider -->
+      <div class="mx-6 border-t border-nord-5"></div>
+
+      <!-- History list -->
+      <div class="flex-1 overflow-y-auto px-4 py-3">
+        {#if chatHistory.length === 0}
+          <div class="flex flex-col items-center justify-center h-full text-center px-4">
+            <MessageSquare size={32} class="text-nord-3/40 mb-3" />
+            <p class="text-sm text-nord-3/70">No saved conversations yet</p>
+            <p class="text-xs text-nord-3/50 mt-1">Your chat history will appear here after you send messages</p>
+          </div>
+        {:else}
+          <div class="flex flex-col gap-1.5">
+            {#each chatHistory as chat, idx (chat.id)}
+              <button
+                class="history-item group w-full text-left px-4 py-3 rounded-xl transition-all duration-200 cursor-pointer
+                  {currentChatId === chat.id ? 'history-item-active' : ''}"
+                onclick={() => loadChat(chat)}
+              >
+                <div class="flex items-start gap-3">
+                  <MessageSquare size={16} class="history-icon history-icon-{idx % 5} shrink-0 mt-0.5" />
+                  <div class="flex-1 min-w-0">
+                    <p class="text-sm font-medium text-nord-0 truncate leading-tight">{chat.title}</p>
+                    <p class="text-[11px] text-nord-3/70 mt-1">{formatHistoryDate(chat.lastMessageAt)}</p>
+                  </div>
+                  <!-- Delete button (hover only) -->
+                  <!-- svelte-ignore a11y_no_static_element_interactions -->
+                  <div
+                    class="opacity-0 group-hover:opacity-100 transition-opacity shrink-0"
+                    onclick={(e) => { e.stopPropagation(); deleteChat(chat.id) }}
+                    onkeydown={(e) => { if(e.key === 'Enter') { e.stopPropagation(); deleteChat(chat.id) } }}
+                    role="button"
+                    tabindex="-1"
+                  >
+                    <Trash2 size={14} class="text-nord-11/60 hover:text-nord-11 transition-colors" />
+                  </div>
+                </div>
+              </button>
+            {/each}
+          </div>
+        {/if}
+      </div>
+
+      <!-- Footer -->
+      {#if chatHistory.length > 0}
+        <div class="px-6 py-4 border-t border-nord-5 bg-nord-6/50">
+          <button 
+            class="w-full text-xs text-nord-11/70 hover:text-nord-11 transition-colors py-2 cursor-pointer"
+            onclick={clearAllHistory}
+          >
+            Clear all history
+          </button>
+        </div>
+      {/if}
     </div>
   </div>
 
