@@ -6,7 +6,7 @@ import httpx
 import json
 from typing import AsyncGenerator
 
-from config import get_settings, Settings
+from config import get_settings, Settings, LLMBackendType
 
 app = FastAPI(title="Simple Chatbot API")
 
@@ -14,7 +14,7 @@ app = FastAPI(title="Simple Chatbot API")
 settings = get_settings()
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[settings.frontend_url, "*"],  # Adjust in production
+    allow_origins=[settings.frontend_url, "*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -29,7 +29,6 @@ async def verify_api_key(
     if not authorization:
         raise HTTPException(status_code=401, detail="Missing Authorization header")
     
-    # Expect "Bearer <api_key>"
     parts = authorization.split()
     if len(parts) != 2 or parts[0].lower() != "bearer":
         raise HTTPException(status_code=401, detail="Invalid Authorization format")
@@ -60,7 +59,7 @@ async def stream_chat_response(
     
     # Build messages with system prompt
     api_messages = [
-        {"role": "system", "content": settings.system_prompt},
+        {"role": "system", "content": settings.resolved_system_prompt},
         *[{"role": m.role, "content": m.content} for m in messages]
     ]
     
@@ -68,18 +67,28 @@ async def stream_chat_response(
         "model": settings.llm_model,
         "messages": api_messages,
         "stream": True,
+        # Generation parameters (helps with roleplay on weaker models)
+        "temperature": settings.temperature,
+        "max_tokens": settings.max_tokens,
+        "top_p": settings.top_p,
+        "repeat_penalty": settings.repeat_penalty,
     }
     
     async with httpx.AsyncClient(timeout=120.0) as client:
         try:
             async with client.stream(
                 "POST",
-                f"{settings.llm_backend_url}/chat/completions",
+                settings.chat_completions_url,
                 json=payload,
             ) as response:
                 if response.status_code != 200:
                     error_text = await response.aread()
-                    yield f"data: {json.dumps({'error': f'LLM backend error: {error_text.decode()}'})}\n\n"
+                    error_msg = error_text.decode()
+                    # Provide helpful hint for common errors
+                    if "not found" in error_msg.lower():
+                        if settings.llm_backend_type == LLMBackendType.OLLAMA:
+                            error_msg += f" (Try running: ollama pull {settings.llm_model})"
+                    yield f"data: {json.dumps({'error': f'LLM backend error: {error_msg}'})}\n\n"
                     return
                 
                 async for line in response.aiter_lines():
@@ -100,7 +109,8 @@ async def stream_chat_response(
                             continue
                             
         except httpx.ConnectError:
-            yield f"data: {json.dumps({'error': 'Cannot connect to LLM backend. Is Ollama/llama.cpp running?'})}\n\n"
+            backend_name = "Ollama" if settings.llm_backend_type == LLMBackendType.OLLAMA else "llama.cpp"
+            yield f"data: {json.dumps({'error': f'Cannot connect to {backend_name} at {settings.llm_backend_url}. Is it running?'})}\n\n"
         except Exception as e:
             yield f"data: {json.dumps({'error': str(e)})}\n\n"
 
@@ -113,7 +123,7 @@ async def get_chat_response(
     """Get full response from LLM backend"""
     
     api_messages = [
-        {"role": "system", "content": settings.system_prompt},
+        {"role": "system", "content": settings.resolved_system_prompt},
         *[{"role": m.role, "content": m.content} for m in messages]
     ]
     
@@ -121,21 +131,26 @@ async def get_chat_response(
         "model": settings.llm_model,
         "messages": api_messages,
         "stream": False,
+        "temperature": settings.temperature,
+        "max_tokens": settings.max_tokens,
+        "top_p": settings.top_p,
+        "repeat_penalty": settings.repeat_penalty,
     }
     
     async with httpx.AsyncClient(timeout=120.0) as client:
         try:
             response = await client.post(
-                f"{settings.llm_backend_url}/chat/completions",
+                settings.chat_completions_url,
                 json=payload,
             )
             response.raise_for_status()
             data = response.json()
             return data["choices"][0]["message"]["content"]
         except httpx.ConnectError:
+            backend_name = "Ollama" if settings.llm_backend_type == LLMBackendType.OLLAMA else "llama.cpp"
             raise HTTPException(
                 status_code=503,
-                detail="Cannot connect to LLM backend. Is Ollama/llama.cpp running?"
+                detail=f"Cannot connect to {backend_name} at {settings.llm_backend_url}. Is it running?"
             )
         except Exception as e:
             raise HTTPException(status_code=500, detail=str(e))
@@ -175,11 +190,24 @@ async def list_models(
     """List available models from the LLM backend"""
     async with httpx.AsyncClient(timeout=30.0) as client:
         try:
-            response = await client.get(f"{settings.llm_backend_url}/models")
+            response = await client.get(settings.models_url)
             response.raise_for_status()
             return response.json()
         except Exception as e:
             raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/config")
+async def get_config(
+    _: bool = Depends(verify_api_key),
+    settings: Settings = Depends(get_settings)
+):
+    """Get current LLM backend configuration (non-sensitive)"""
+    return {
+        "backend_type": settings.llm_backend_type.value,
+        "model": settings.llm_model,
+        "backend_url": settings.llm_backend_url,
+    }
 
 
 if __name__ == "__main__":

@@ -31,23 +31,12 @@ FastAPI backend that works with both **Ollama** and **llama.cpp** as LLM provide
 
 ## Running
 
-### Local only
 ```bash
 cd backend
 python run.py
 ```
 
-### With ngrok (first time - set auth token)
-```bash
-python run.py --ngrok-auth YOUR_NGROK_AUTH_TOKEN
-```
-
-### With ngrok tunnel
-```bash
-python run.py --ngrok
-```
-
-This will print the public URL. Update your frontend's `API_URL` with it.
+Server runs at `http://localhost:8000`
 
 ## API Endpoints
 

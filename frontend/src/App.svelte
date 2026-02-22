@@ -3,9 +3,8 @@
   import { Send, Trash, Info, X, Github, ExternalLink, Cake, Sun, Moon, Eye, Pen, Book } from 'lucide-svelte';
 
   // ── API Configuration ──
-  // Change this to your ngrok URL when using remote access
-  const API_URL = 'http://localhost:8000'
-  const API_KEY = 'changeme'  // Must match backend .env API_KEY
+  const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:8000'
+  const API_KEY = import.meta.env.VITE_API_KEY ?? 'changeme'
 
   /* ── Theme state ── */
   let isDark = $state(false)
@@ -275,7 +274,7 @@
 
   <!-- ─── Character Info Card (Left) ─── -->
   <div class="card-panel-wrapper shrink-0 overflow-hidden transition-all duration-300 ease-out {showCharacterCard ? '' : 'max-lg:pointer-events-none'}" style="width: {showCharacterCard ? '24rem' : '0'}; height: min(700px, 85vh);">
-    <div class="character-card w-96 h-full flex flex-col rounded-3xl overflow-hidden" style="opacity: {showCharacterCard ? '1' : '0'}; transform: translateX({showCharacterCard ? '0' : '-100%'});">
+    <div class="character-card w-96 h-full flex flex-col rounded-3xl overflow-hidden" style="opacity: {showCharacterCard ? '1' : '0'}; transform: translateX({showCharacterCard ? '0' : '100%'});">
       <!-- Close button -->
       <button 
         class="absolute top-3 right-3 z-10 w-8 h-8 rounded-full bg-white/80 backdrop-blur flex items-center justify-center text-nord-3 hover:text-nord-0 hover:bg-white transition-all shadow-sm cursor-pointer"
@@ -424,7 +423,8 @@
               {/if}
             </div>
           {:else}
-            <!-- Assistant message (left-aligned, with avatar) -->
+            <!-- Assistant message (left-aligned, with avatar) - only show if has content -->
+            {#if msg.content}
             <div class="msg-enter flex gap-2 items-end">
               {#if shouldShowAvatar(i)}
                 <img src="/src/assets/mini-profile.png" alt="Ushio Noa" class="w-7 h-7 rounded-full object-cover shrink-0" />
@@ -441,6 +441,7 @@
                 {/if}
               </div>
             </div>
+            {/if}
           {/if}
 
         <!-- ── Rich message (text + stats + images) ── -->
@@ -522,16 +523,16 @@
       {#if loading}
         <div class="msg-enter flex gap-2 items-end">
           <img src="/src/assets/mini-profile.png" alt="Ushio Noa" class="w-7 h-7 rounded-full object-cover shrink-0" />
-          <div class="bg-nord-0 rounded-[18px] rounded-bl-[4px] px-4 py-3">
-            <div class="flex items-center gap-2">
-              <span class="text-xs text-white/60 italic">AI is thinking</span>
+          <div class="flex flex-col items-start">
+            <div class="bg-nord-0 rounded-[18px] rounded-bl-[4px] px-4 py-3">
               <div class="flex gap-1 items-center">
                 {#each [0, 1, 2] as i}
-                  <span class="dot-bounce block w-1.5 h-1.5 rounded-full bg-white/70"
-                    style="animation-delay: {i * 0.2}s"></span>
+                  <span class="dot-bounce block w-2 h-2 rounded-full bg-white/70"
+                    style="animation-delay: {i * 0.15}s"></span>
                 {/each}
               </div>
             </div>
+            <span class="text-[11px] text-nord-3/70 mt-1 px-1">Noa is typing...</span>
           </div>
         </div>
       {/if}
@@ -573,7 +574,7 @@
 
   <!-- ─── Project Info Card (Right) ─── -->
   <div class="card-panel-wrapper shrink-0 overflow-hidden transition-all duration-300 ease-out {showProjectCard ? '' : 'max-lg:pointer-events-none'}" style="width: {showProjectCard ? '20rem' : '0'}; height: min(600px, 80vh);">
-    <div class="project-card w-80 h-full flex flex-col rounded-3xl overflow-hidden" style="opacity: {showProjectCard ? '1' : '0'}; transform: translateX({showProjectCard ? '0' : '100%'});">
+    <div class="project-card w-80 h-full flex flex-col rounded-3xl overflow-hidden" style="opacity: {showProjectCard ? '1' : '0'}; transform: translateX({showProjectCard ? '0' : '-100%'});">
       <!-- Close button -->
       <button 
         class="absolute top-3 right-3 z-10 w-8 h-8 rounded-full bg-white/80 backdrop-blur flex items-center justify-center text-nord-3 hover:text-nord-0 hover:bg-white transition-all shadow-sm cursor-pointer"
