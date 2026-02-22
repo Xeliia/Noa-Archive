@@ -1,6 +1,6 @@
 <script>
   import { tick } from 'svelte'
-  import { Send, Trash, Info, X, Github, ExternalLink, Cake, Sun, Moon, Eye, Pen, Book } from 'lucide-svelte';
+  import { Send, Trash, Info, X, Github, ExternalLink, Cake, Sun, Moon, Eye, Pen, Book, CircleStop } from 'lucide-svelte';
 
   // ── API Configuration ──
   const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:8000'
@@ -92,16 +92,27 @@
   let loading = $state(false)
   let bottomEl = $state(null)
   let textareaEl = $state(null)
+  let abortController = $state(null)
+
+  /* ── Interrupt Presets ── */
+  const INTERRUPT_RESPONSES = [
+    "Sensei... it's rather rude to interrupt someone mid-sentence, don't you think?",
+    "Fufu, cutting me off already? I hadn't even reached my point yet, Sensei.",
+    "...I wasn't finished, Sensei. But I suppose I'll let it slide. This time.",
+    "Fufu... You remind me of Koyuki-san just now. Always cutting in before the important part.",
+    "...I was still recording my thoughts, Sensei. Now I'll have to start a new entry. How troublesome.",
+    "Sensei, even Koyuki-san waits until I finish writing before causing trouble. ...Usually.",
+    "Hmm, I suppose I'll note this interruption in today's log. For reference, of course. Fufu.",
+  ]
 
   function formatTime(date) {
     return date.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit', hour12: true })
   }
 
   function shouldShowTime(index) {
+    // Show time on the last message of each consecutive role group
     if (index === messages.length - 1) return true
-    const currentTime = formatTime(messages[index].time)
-    const nextTime = formatTime(messages[index + 1].time)
-    return currentTime !== nextTime
+    return messages[index].role !== messages[index + 1].role
   }
 
   function shouldShowAvatar(index) {
@@ -129,8 +140,20 @@
   }
 
   function clearChat() {
+    if (abortController) {
+      abortController.abort()
+      abortController = null
+    }
     messages = getRandomPreset()
     input = ''
+    loading = false
+  }
+
+  function stopGenerating() {
+    if (abortController) {
+      abortController.abort()
+      abortController = null
+    }
   }
 
   async function sendMessage(text) {
@@ -143,16 +166,17 @@
     const userMsg = { id: Date.now(), role: 'user', content, time: new Date(), type: 'text' }
     messages = [...messages, userMsg]
     loading = true
+    abortController = new AbortController()
     await scrollToBottom()
 
-    // Create placeholder for streaming response
-    const assistantMsgId = Date.now() + 1
-    const assistantMsg = { id: assistantMsgId, role: 'assistant', content: '', time: new Date(), type: 'text' }
-    messages = [...messages, assistantMsg]
+    // Track IDs for paragraph bubbles
+    let paragraphCount = 0
+    const baseId = Date.now() + 1
+    let wasInterrupted = false
 
     try {
       const history = messages
-        .filter(m => m.type === 'text' && m.content && m.id !== assistantMsgId)
+        .filter(m => m.type === 'text' && m.content)
         .map(m => ({ role: m.role, content: m.content }))
       
       const res = await fetch(`${API_URL}/chat`, {
@@ -165,16 +189,16 @@
           messages: history,
           stream: true
         }),
+        signal: abortController.signal,
       })
 
       if (!res.ok) {
         throw new Error(`HTTP ${res.status}`)
       }
 
-      // Handle streaming response (SSE)
       const reader = res.body.getReader()
       const decoder = new TextDecoder()
-      let accumulated = ''
+      let currentParagraph = ''
 
       while (true) {
         const { done, value } = await reader.read()
@@ -191,16 +215,28 @@
             try {
               const parsed = JSON.parse(data)
               if (parsed.error) {
-                accumulated = parsed.error
+                currentParagraph = parsed.error
               } else if (parsed.content) {
-                accumulated += parsed.content
-                // Update the message reactively
-                messages = messages.map(m => 
-                  m.id === assistantMsgId 
-                    ? { ...m, content: accumulated }
-                    : m
-                )
-                await scrollToBottom()
+                currentParagraph += parsed.content
+
+                // Check if we have a completed paragraph (double newline)
+                const parts = currentParagraph.split(/\n\n+/)
+                while (parts.length > 1) {
+                  const completedParagraph = parts.shift().trim()
+                  if (completedParagraph) {
+                    // Add completed paragraph as a new bubble
+                    const bubbleId = baseId + paragraphCount++
+                    messages = [...messages, {
+                      id: bubbleId,
+                      role: 'assistant',
+                      content: completedParagraph,
+                      time: new Date(),
+                      type: 'text'
+                    }]
+                    await scrollToBottom()
+                  }
+                  currentParagraph = parts.join('\n\n')
+                }
               }
             } catch (e) {
               // Skip invalid JSON
@@ -209,23 +245,53 @@
         }
       }
 
-      // Ensure final update
-      if (!accumulated) {
-        accumulated = "Sorry, I couldn't respond."
+      // Add any remaining text as final bubble
+      const remaining = currentParagraph.trim()
+      if (remaining) {
+        const bubbleId = baseId + paragraphCount++
+        messages = [...messages, {
+          id: bubbleId,
+          role: 'assistant',
+          content: remaining,
+          time: new Date(),
+          type: 'text'
+        }]
       }
-      messages = messages.map(m => 
-        m.id === assistantMsgId 
-          ? { ...m, content: accumulated }
-          : m
-      )
-    } catch {
-      messages = messages.map(m => 
-        m.id === assistantMsgId 
-          ? { ...m, content: 'Something went wrong. Please try again.' }
-          : m
-      )
+
+      // If nothing was generated at all
+      if (paragraphCount === 0) {
+        messages = [...messages, {
+          id: baseId,
+          role: 'assistant',
+          content: "Sorry, I couldn't respond.",
+          time: new Date(),
+          type: 'text'
+        }]
+      }
+    } catch (err) {
+      if (err.name === 'AbortError') {
+        // User interrupted — add a sassy Noa response
+        wasInterrupted = true
+        const interruptMsg = INTERRUPT_RESPONSES[Math.floor(Math.random() * INTERRUPT_RESPONSES.length)]
+        messages = [...messages, {
+          id: baseId + paragraphCount,
+          role: 'assistant',
+          content: interruptMsg,
+          time: new Date(),
+          type: 'text'
+        }]
+      } else {
+        messages = [...messages, {
+          id: baseId + paragraphCount,
+          role: 'assistant',
+          content: 'Something went wrong. Please try again.',
+          time: new Date(),
+          type: 'text'
+        }]
+      }
     } finally {
       loading = false
+      abortController = null
       await scrollToBottom()
     }
   }
@@ -556,17 +622,28 @@
           class="flex-1 bg-transparent border-none outline-none resize-none text-sm text-nord-0 placeholder-nord-3/50 max-h-28 py-2.5 leading-none"
         ></textarea>
 
-        <!-- Send -->
-        <button
-          class="w-10 h-10 rounded-full flex items-center justify-center shrink-0 border-none transition-all duration-200
-            {input.trim() && !loading
-              ? 'bg-nord-0 text-white shadow-sm hover:bg-nord-1 hover:scale-105 cursor-pointer'
-              : 'bg-nord-4/60 text-nord-3/40 cursor-default'}"
-          onclick={() => sendMessage()}
-          disabled={!input.trim() || loading}
-        >
-          <Send size={18} />
-        </button>
+        <!-- Send / Stop -->
+        {#if loading}
+          <button
+            class="w-10 h-10 rounded-full flex items-center justify-center shrink-0 border-none transition-all duration-200
+              bg-red-500/80 text-white shadow-sm hover:bg-red-600 hover:scale-105 cursor-pointer"
+            onclick={() => stopGenerating()}
+            title="Stop generating"
+          >
+            <CircleStop size={18} />
+          </button>
+        {:else}
+          <button
+            class="w-10 h-10 rounded-full flex items-center justify-center shrink-0 border-none transition-all duration-200
+              {input.trim()
+                ? 'bg-nord-0 text-white shadow-sm hover:bg-nord-1 hover:scale-105 cursor-pointer'
+                : 'bg-nord-4/60 text-nord-3/40 cursor-default'}"
+            onclick={() => sendMessage()}
+            disabled={!input.trim()}
+          >
+            <Send size={18} />
+          </button>
+        {/if}
       </div>
     </div>
 
