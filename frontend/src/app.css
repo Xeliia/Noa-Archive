@@ -116,19 +116,19 @@ body {
 }
 
 [data-theme="nord-dark"] .chat-card {
+  border: 1px solid #4C566A;
   box-shadow:
     0 4px 6px -1px rgba(0, 0, 0, 0.3),
-    0 20px 50px -12px rgba(0, 0, 0, 0.5),
-    0 0 0 1px rgba(67, 76, 94, 0.8);
+    0 20px 50px -12px rgba(0, 0, 0, 0.5);
 }
 
 [data-theme="nord-dark"] .character-card,
 [data-theme="nord-dark"] .project-card,
 [data-theme="nord-dark"] .history-card {
+  border: 1px solid #4C566A;
   box-shadow:
     0 4px 6px -1px rgba(0, 0, 0, 0.3),
     0 20px 50px -12px rgba(0, 0, 0, 0.5),
-    0 0 0 1px rgba(67, 76, 94, 0.8),
     0 0 40px -10px rgba(136, 192, 208, 0.12),
     0 0 80px -20px rgba(180, 142, 173, 0.08);
 }
@@ -137,6 +137,8 @@ body {
 [data-theme="nord-dark"] .text-nord-0 { color: #ECEFF4 !important; }
 [data-theme="nord-dark"] .text-nord-3 { color: #D8DEE9 !important; }
 [data-theme="nord-dark"] .text-nord-3\/70 { color: rgba(216, 222, 233, 0.7) !important; }
+[data-theme="nord-dark"] .text-nord-3\/50 { color: rgba(216, 222, 233, 0.6) !important; }
+[data-theme="nord-dark"] .text-nord-3\/40 { color: rgba(216, 222, 233, 0.5) !important; }
 [data-theme="nord-dark"] .text-white { color: #ECEFF4 !important; }
 
 /* ── Dark mode backgrounds ── */
@@ -420,10 +422,10 @@ body {
 .history-card {
   background: #ffffff;
   border-radius: 24px;
+  border: 1px solid rgba(216, 222, 233, 0.6);
   box-shadow:
     0 4px 6px -1px rgba(46, 52, 64, 0.05),
-    0 20px 50px -12px rgba(46, 52, 64, 0.12),
-    0 0 0 1px rgba(216, 222, 233, 0.5);
+    0 20px 50px -12px rgba(46, 52, 64, 0.12);
   transition: background-color 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease, opacity 0.3s ease, transform 0.3s ease;
 }
 
