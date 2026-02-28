@@ -407,6 +407,7 @@ body {
 .chat-card {
   background: #ffffff;
   border-radius: 24px;
+  border: 1px solid transparent;
   box-shadow:
     0 4px 6px -1px rgba(46, 52, 64, 0.05),
     0 20px 50px -12px rgba(46, 52, 64, 0.12),
