@@ -1,6 +1,6 @@
 # Noa's Archive — AI Chatbot
 
-In partial fulfillment of **CS321L-M / CS322-M Artificial Intelligence**.  
+In partial fulfillment on **CS321L-M / CS322-M Artificial Intelligence**.  
 A roleplay chatbot featuring **Ushio Noa** from Blue Archive — but in this setting, she's the **Student Council President of South City Homes Academy (SCHA)**, serving as your personal guide for onboarding with the school.  
 Chat with Noa through a polished messenger-style UI powered by your choice of LLM backend.
 
