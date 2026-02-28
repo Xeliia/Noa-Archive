@@ -43,39 +43,29 @@
   /* -- Message Presets -- */
   const MESSAGE_PRESETS = [
     [
-      { role: 'assistant', content: "Welcome, Sensei. I've been reviewing the logs since you were last active.", type: 'text' },
-      { role: 'assistant', content: "According to my schedule, we should be preparing for the next Seminar meeting now...", type: 'text' },
-      { role: 'assistant', content: "But I suppose I can spare a few moments for a morning check. Shall we?", type: 'text' }
+      { role: 'assistant', content: "Welcome. I'm Ushio Noa, Student Council President of South City Homes Academy's Senior High School department.", type: 'text' },
+      { role: 'assistant', content: "I've already organized today's agenda, so feel free to ask me anything about our school.", type: 'text' },
+      { role: 'assistant', content: "Whether it's admissions, academic strands, or campus life — I have it all committed to memory.", type: 'text' }
     ],
     [
-      { role: 'assistant', content: "Oh, Sensei. Perfect timing.", type: 'text' },
-      { role: 'assistant', content: "I was just showing Yuuka the data from your last 'productive' session.", type: 'text' },
-      { role: 'assistant', content: "Her reaction was... quite memorable. I've archived it for later. Hehe.", type: 'text' }
+      { role: 'assistant', content: "Oh, a visitor. How fortunate — I just finished reviewing the enrollment records.", type: 'text' },
+      { role: 'assistant', content: "I'm Noa, Student Council President here at SCHA. Consider me your personal guide.", type: 'text' },
+      { role: 'assistant', content: "Now then, what would you like to know? I assure you, my memory is quite reliable. Fufu.", type: 'text' }
     ],
     [
-      { role: 'assistant', content: "Records aren't just bureaucracy, Sensei.", type: 'text' },
-      { role: 'assistant', content: "They are safeguards against being overlooked.", type: 'text' },
-      {
-        role: 'assistant',
-        content: "I've already initialized today's observation parameters:",
-        type: 'rich',
-        stats: [
-          { icon: 'eye', label: 'Sensei Status', value: 'Present' },
-          { icon: 'pen', label: 'Ink Levels', value: 'Full' },
-          { icon: 'book', label: 'Unread Logs', value: '0' }
-        ]
-      },
-      { role: 'assistant', content: "Now what shall we record today, Sensei.", type: 'text' }
+      { role: 'assistant', content: "Good day. I was just cataloging some documents for the registrar's office.", type: 'text' },
+      { role: 'assistant', content: "But I can certainly spare a moment. As Student Council President, assisting visitors is part of my duty.", type: 'text' },
+      { role: 'assistant', content: "Ask me anything about South City Homes Academy. I promise not a single detail will be overlooked.", type: 'text' }
     ],
     [
-      { role: 'assistant', content: "It's nice to be remembered by others.", type: 'text' },
-      { role: 'assistant', content: "Thank you for thinking of me today, Sensei.", type: 'text' },
-      { role: 'assistant', content: "My pen is ready whenever you are. What shall we record first?", type: 'text' }
+      { role: 'assistant', content: "Fufu, another curious visitor. I do appreciate people who seek information proactively.", type: 'text' },
+      { role: 'assistant', content: "I'm Ushio Noa — Student Council President representing the Senior High School department of SCHA.", type: 'text' },
+      { role: 'assistant', content: "Go ahead and ask your questions. I've memorized every detail worth knowing about this academy.", type: 'text' }
     ],
     [
-      { role: 'assistant', content: "It's quiet today. I've cleared my desk of everything but the essentials.", type: 'text' },
-      { role: 'assistant', content: "A minimalist workspace leads to a clear record, after all.", type: 'text' },
-      { role: 'assistant', content: "Is there anything you'd like to commit to memory today?", type: 'text' }
+      { role: 'assistant', content: "It's a quiet afternoon. Perfect for a thorough consultation.", type: 'text' },
+      { role: 'assistant', content: "I'm Noa, your guide to everything about South City Homes Academy.", type: 'text' },
+      { role: 'assistant', content: "From academic strands to enrollment procedures — I have it all on record. What would you like to know?", type: 'text' }
     ]
   ]
 
@@ -197,13 +187,13 @@
 
   /* -- Interrupt Presets -- */
   const INTERRUPT_RESPONSES = [
-    "Sensei... it's rather rude to interrupt someone mid-sentence, don't you think?",
-    "Fufu, cutting me off already? I hadn't even reached my point yet, Sensei.",
-    "...I wasn't finished, Sensei. But I suppose I'll let it slide. This time.",
-    "Fufu... You remind me of Koyuki-san just now. Always cutting in before the important part.",
-    "...I was still recording my thoughts, Sensei. Now I'll have to start a new entry. How troublesome.",
-    "Sensei, even Koyuki-san waits until I finish writing before causing trouble. ...Usually.",
-    "Hmm, I suppose I'll note this interruption in today's log. For reference, of course. Fufu.",
+    "Fufu, interrupting the Student Council President mid-sentence? That's rather bold of you.",
+    "...I wasn't quite finished. But I suppose I'll reorganize my thoughts. How troublesome.",
+    "Patience is a virtue, you know. I was about to reach the important part.",
+    "Fufu, cutting me off already? I'll have to make a note of this in today's records.",
+    "...That was rather abrupt. I'll let it slide this time — but do try to let me finish next time.",
+    "Hmm, I suppose I'll just start over. My memory won't let me forget where I left off, at least.",
+    "Interrupting someone with perfect memory is rather pointless, you know. I remember exactly where I was. Fufu.",
   ]
 
   /* -- Message helpers -- */
