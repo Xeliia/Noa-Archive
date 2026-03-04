@@ -14,7 +14,6 @@ class LLMBackendType(str, Enum):
     OPENAI_COMPATIBLE = "openai_compatible"
 
 
-# Default base URLs per backend type
 _DEFAULT_URLS: dict[LLMBackendType, str] = {
     LLMBackendType.OLLAMA: "http://localhost:11434",
     LLMBackendType.LLAMACPP: "http://localhost:8080",
@@ -23,7 +22,6 @@ _DEFAULT_URLS: dict[LLMBackendType, str] = {
     LLMBackendType.OPENAI_COMPATIBLE: "http://localhost:8080",
 }
 
-# Default model per backend type
 _DEFAULT_MODELS: dict[LLMBackendType, str] = {
     LLMBackendType.OLLAMA: "llama3.2",
     LLMBackendType.LLAMACPP: "local-model",
@@ -32,7 +30,6 @@ _DEFAULT_MODELS: dict[LLMBackendType, str] = {
     LLMBackendType.OPENAI_COMPATIBLE: "default",
 }
 
-# Default system prompt (used if no prompt file is specified)
 DEFAULT_SYSTEM_PROMPT = """You are Ushio Noa, a warm and intelligent AI assistant. Keep responses concise and conversational."""
 
 
@@ -42,15 +39,9 @@ class Settings(BaseSettings):
         env_file_encoding="utf-8",
     )
 
-    # LLM Backend Configuration
     # Backend type: "ollama", "llamacpp", "gemini", "openai", or "openai_compatible"
     llm_backend_type: LLMBackendType = LLMBackendType.OLLAMA
     
-    # Backend URL — leave empty to use the default for your backend type
-    # Ollama: http://localhost:11434
-    # llama.cpp: http://localhost:8080
-    # Gemini: https://generativelanguage.googleapis.com/v1beta/openai
-    # OpenAI: https://api.openai.com/v1
     llm_backend_url: Optional[str] = None
     llm_model: Optional[str] = None  # Leave empty to use default for backend type
 
@@ -60,7 +51,6 @@ class Settings(BaseSettings):
     # API Security (for *this* chatbot server, not the LLM provider)
     api_key: str = "changeme"
     
-    # Server settings
     host: str = "0.0.0.0"
     port: int = 8000
     
@@ -72,9 +62,8 @@ class Settings(BaseSettings):
     # Examples: "noa.txt" or "You are a helpful assistant..."
     system_prompt: str = "noa.txt"
     
-    # Generation parameters (tune for your model)
-    temperature: float = 0.8  # Higher = more creative, lower = more focused
-    max_tokens: int = 512  # Keep low for weak models to avoid gibberish
+    temperature: float = 0.8
+    max_tokens: int = 512
     top_p: float = 0.9
     repeat_penalty: float = 1.1  # Only used for local backends (ollama/llamacpp)
     frequency_penalty: float = 0.0  # Only used for cloud backends
@@ -106,7 +95,6 @@ class Settings(BaseSettings):
     @property
     def resolved_system_prompt(self) -> str:
         """Load system prompt from file if it's a filename, otherwise return as-is"""
-        # Check if it looks like a filename
         if self.system_prompt.endswith(".txt"):
             prompt_path = Path(__file__).parent / "prompts" / self.system_prompt
             if prompt_path.exists():
@@ -125,7 +113,6 @@ class Settings(BaseSettings):
         elif self.llm_backend_type == LLMBackendType.LLAMACPP:
             return f"{base}/v1/chat/completions"
         else:
-            # Gemini, OpenAI, and OpenAI-compatible all use /chat/completions
             return f"{base}/chat/completions"
     
     @property
@@ -157,14 +144,11 @@ class Settings(BaseSettings):
             "top_p": self.top_p,
         }
         if self.is_cloud_backend:
-            # Cloud APIs handle their own output length — don't cap with max_tokens
-            # Cloud APIs use frequency/presence penalty instead of repeat_penalty
             if self.frequency_penalty != 0.0:
                 payload["frequency_penalty"] = self.frequency_penalty
             if self.presence_penalty != 0.0:
                 payload["presence_penalty"] = self.presence_penalty
         else:
-            # Local backends use max_tokens and repeat_penalty
             payload["max_tokens"] = self.max_tokens
             payload["repeat_penalty"] = self.repeat_penalty
         return payload

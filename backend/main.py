@@ -10,7 +10,6 @@ from config import get_settings, Settings, LLMBackendType
 
 app = FastAPI(title="Simple Chatbot API")
 
-# CORS middleware
 settings = get_settings()
 app.add_middleware(
     CORSMiddleware,
@@ -21,7 +20,6 @@ app.add_middleware(
 )
 
 
-# ── Auth Dependency ──
 async def verify_api_key(
     authorization: str | None = Header(None),
     settings: Settings = Depends(get_settings)
@@ -39,9 +37,8 @@ async def verify_api_key(
     return True
 
 
-# ── Request/Response Models ──
 class Message(BaseModel):
-    role: str  # "user" or "assistant"
+    role: str
     content: str
 
 
@@ -50,14 +47,12 @@ class ChatRequest(BaseModel):
     stream: bool = True
 
 
-# ── Streaming Generator ──
 async def stream_chat_response(
     messages: list[Message],
     settings: Settings
 ) -> AsyncGenerator[str, None]:
     """Stream response from LLM backend"""
     
-    # Build messages with system prompt
     api_messages = [
         {"role": "system", "content": settings.resolved_system_prompt},
         *[{"role": m.role, "content": m.content} for m in messages]
@@ -76,7 +71,6 @@ async def stream_chat_response(
                 if response.status_code != 200:
                     error_text = await response.aread()
                     error_msg = error_text.decode()
-                    # Provide helpful hint for common errors
                     if "not found" in error_msg.lower():
                         if settings.llm_backend_type == LLMBackendType.OLLAMA:
                             error_msg += f" (Try running: ollama pull {settings.resolved_model})"
@@ -95,13 +89,11 @@ async def stream_chat_response(
                             chunk = json.loads(data)
                             choice = chunk.get("choices", [{}])[0]
                             
-                            # Extract content from OpenAI-compatible format
                             delta = choice.get("delta", {})
                             content = delta.get("content", "")
                             if content:
                                 yield f"data: {json.dumps({'content': content})}\n\n"
                             
-                            # Check if generation stopped abnormally
                             finish_reason = choice.get("finish_reason")
                             if finish_reason and finish_reason not in ("stop", "end_turn"):
                                 if settings.is_cloud_backend:
@@ -115,8 +107,7 @@ async def stream_chat_response(
                                     "SAFETY": " (blocked by safety filter)",
                                     "MAX_TOKENS": length_msg,
                                 }.get(finish_reason, f" (reason: {finish_reason})")
-                                print(f"⚠️  Generation stopped: {finish_reason}")
-                                yield f"data: {json.dumps({'content': f'\\n\\n[⚠️ Stopped{reason_msg}]'})}\n\n"
+                                yield f"data: {json.dumps({'content': f'\\n\\n[Stopped{reason_msg}]'})}\n\n"
                         except json.JSONDecodeError:
                             continue
                             
@@ -126,7 +117,6 @@ async def stream_chat_response(
             yield f"data: {json.dumps({'error': str(e)})}\n\n"
 
 
-# ── Non-Streaming Chat ──
 async def get_chat_response(
     messages: list[Message],
     settings: Settings
@@ -159,7 +149,6 @@ async def get_chat_response(
             raise HTTPException(status_code=500, detail=str(e))
 
 
-# ── Endpoints ──
 @app.get("/health")
 async def health_check():
     return {"status": "ok"}
