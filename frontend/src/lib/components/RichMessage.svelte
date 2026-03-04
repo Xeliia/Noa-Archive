@@ -10,7 +10,6 @@
 </script>
 
 <div class="msg-enter flex gap-2 items-end">
-  <!-- Avatar -->
   {#if showAvatar}
     <img src="/src/lib/assets/mini-profile.png" alt="Ushio Noa" class="w-7 h-7 rounded-full object-cover shrink-0" />
   {:else}
@@ -18,12 +17,10 @@
   {/if}
   
   <div class="flex flex-col items-start max-w-[85%]">
-    <!-- Text bubble -->
     <div class="msg-bubble-noa rounded-[18px] rounded-bl-[4px] px-4 py-2.5 text-sm leading-relaxed w-full">
       {msg.content}
     </div>
 
-    <!-- Stats card -->
     {#if msg.stats}
       <div class="stats-card w-full mt-2 bg-white border border-nord-5 rounded-2xl overflow-hidden">
         <div class="stats-grid grid grid-cols-3 divide-x divide-nord-5">
@@ -46,7 +43,6 @@
       </div>
     {/if}
 
-    <!-- Image grid -->
     {#if msg.images}
       <div class="w-full mt-2 bg-nord-0 rounded-2xl overflow-hidden p-1">
         <p class="text-white text-xs px-3 pt-2 pb-1.5 opacity-80">Here are the photos:</p>

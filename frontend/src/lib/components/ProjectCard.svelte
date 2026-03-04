@@ -9,7 +9,6 @@
 
 <div class="card-panel-wrapper shrink-0 overflow-hidden transition-all duration-300 ease-out {show ? '' : 'max-lg:pointer-events-none'}" style="width: {show ? '20rem' : '0'}; height: min(600px, 80vh);">
   <div class="project-card w-80 h-full flex flex-col rounded-3xl overflow-hidden" style="opacity: {show ? '1' : '0'}; transform: translateX({show ? '0' : '-100%'});">
-    <!-- Close button -->
     <button 
       class="absolute top-3 right-3 z-10 w-8 h-8 rounded-full bg-white/80 backdrop-blur flex items-center justify-center text-nord-3 hover:text-nord-0 hover:bg-white transition-all shadow-sm cursor-pointer"
       onclick={onClose}
@@ -17,15 +16,12 @@
       <X size={16} />
     </button>
 
-    <!-- Header -->
     <div class="px-6 pt-8 pb-6">
       <h2 class="text-xl font-semibold text-nord-0 mb-1">About This Project</h2>
       <p class="text-sm text-nord-3">Noa AI Chatbot</p>
     </div>
 
-    <!-- Content -->
     <div class="flex-1 overflow-y-auto px-6 pb-6">
-      <!-- Description -->
       <div class="mb-6">
         <h3 class="text-xs text-nord-3 uppercase tracking-wider font-medium mb-2">Description</h3>
         <p class="text-sm text-nord-0 leading-relaxed">
@@ -33,7 +29,6 @@
         </p>
       </div>
 
-      <!-- Tech Stack -->
       <div class="mb-6">
         <h3 class="text-xs text-nord-3 uppercase tracking-wider font-medium mb-2">Tech Stack</h3>
         <div class="flex flex-wrap gap-2">
@@ -46,7 +41,6 @@
         </div>
       </div>
 
-      <!-- Future Plans -->
       <div class="mb-6">
         <h3 class="text-xs text-nord-3 uppercase tracking-wider font-medium mb-2">Future Plans</h3>
         <p class="text-sm text-nord-0 leading-relaxed">
@@ -55,7 +49,6 @@
         </p>
       </div>
 
-      <!-- Credits -->
       <div class="mb-6">
         <h3 class="text-xs text-nord-3 uppercase tracking-wider font-medium mb-2">Credits</h3>
         <p class="text-sm text-nord-0 leading-relaxed">
@@ -63,7 +56,6 @@
         </p>
       </div>
 
-      <!-- Links -->
       <div>
         <h3 class="text-xs text-nord-3 uppercase tracking-wider font-medium mb-3">Links</h3>
         <div class="flex flex-col gap-2">
@@ -81,7 +73,6 @@
       </div>
     </div>
 
-    <!-- Footer -->
     <div class="px-6 py-4 border-t border-nord-5 bg-nord-6/50">
       <p class="text-xs text-nord-3 text-center">
         Version 1.0.0 • Made with ♥

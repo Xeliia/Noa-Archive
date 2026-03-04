@@ -7,7 +7,7 @@
     onClose,
   } = $props()
 
-  /* ── 3D Tilt effect ── */
+  // 3D tilt
   function handleTiltMove(e) {
     const card = e.currentTarget
     const rect = card.getBoundingClientRect()
@@ -56,7 +56,6 @@
       </div>
     </div>
     
-    <!-- Close button -->
     <button 
       class="absolute top-6 right-6 w-10 h-10 rounded-full bg-white/20 backdrop-blur flex items-center justify-center text-white hover:bg-white/30 transition-all"
       onclick={onClose}

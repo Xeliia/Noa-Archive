@@ -1,7 +1,6 @@
 <script>
   import { tick } from 'svelte'
 
-  // -- Components --
   import ChatHeader from './lib/components/ChatHeader.svelte'
   import ChatMessage from './lib/components/ChatMessage.svelte'
   import RichMessage from './lib/components/RichMessage.svelte'
@@ -12,24 +11,21 @@
   import HistoryPanel from './lib/components/HistoryPanel.svelte'
   import Lightbox from './lib/components/Lightbox.svelte'
 
-  // -- API Configuration --
   const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:8000'
   const API_KEY = import.meta.env.VITE_API_KEY ?? 'changeme'
 
-  /* -- Theme state -- */
+  // theme
   let isDark = $state(false)
   
   function toggleTheme() {
     isDark = !isDark
   }
 
-  /* -- Card panel states -- */
+  // panel state
   let showCharacterCard = $state(false)
   let showProjectCard = $state(false)
   let showHistoryPanel = $state(false)
   let showLightbox = $state(false)
-  
-  /* -- Closing animation states -- */
   let closingLightbox = $state(false)
   
   function closeLightbox() {
@@ -40,7 +36,7 @@
     }, 250)
   }
 
-  /* -- Message Presets -- */
+  // greeting presets
   const MESSAGE_PRESETS = [
     [
       { role: 'assistant', content: "Welcome, Sensei. I've been reviewing the logs since you were last active.", type: 'text' },
@@ -95,7 +91,7 @@
   let bottomEl = $state(null)
   let abortController = $state(null)
 
-  /* -- Chat History (localStorage) -- */
+  // chat history
   const HISTORY_KEY = 'noa-chat-history'
   const MAX_HISTORY = 50
 
@@ -112,7 +108,7 @@
   function saveHistory() {
     try {
       localStorage.setItem(HISTORY_KEY, JSON.stringify(chatHistory.slice(0, MAX_HISTORY)))
-    } catch { /* storage full -- silently fail */ }
+    } catch { }
   }
 
   function getChatTitle(msgs) {
@@ -195,7 +191,7 @@
     return date.toLocaleDateString([], { month: 'short', day: 'numeric' })
   }
 
-  /* -- Interrupt Presets -- */
+  // interrupt responses
   const INTERRUPT_RESPONSES = [
     "Sensei... it's rather rude to interrupt someone mid-sentence, don't you think?",
     "Fufu, cutting me off already? I hadn't even reached my point yet, Sensei.",
@@ -206,7 +202,6 @@
     "Hmm, I suppose I'll note this interruption in today's log. For reference, of course. Fufu.",
   ]
 
-  /* -- Message helpers -- */
   function formatTime(date) {
     return date.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit', hour12: true })
   }
@@ -324,13 +319,11 @@
                 }
               }
             } catch (e) {
-              // Skip invalid JSON
             }
           }
         }
       }
 
-      // Process remaining line buffer
       if (lineBuffer.trim()) {
         const line = lineBuffer.trim()
         if (line.startsWith('data: ')) {
@@ -349,7 +342,6 @@
         pendingBubbles.push(remaining)
       }
 
-      // Display bubbles with natural typing delay
       for (let i = 0; i < pendingBubbles.length; i++) {
         if (i > 0) {
           const delay = 1500 + Math.random() * 1000
@@ -402,7 +394,6 @@
     }
   }
 
-  /* -- Panel toggle helpers -- */
   function toggleCharacter() {
     showCharacterCard = !showCharacterCard
     showProjectCard = false
@@ -439,17 +430,16 @@
 
 <div data-theme={isDark ? 'nord-dark' : 'nord'} class="theme-wrapper min-h-screen flex items-center justify-center p-4 md:p-8 gap-4">
 
-  <!-- Character Info Card (Left) -->
+  <!-- character card -->
   <CharacterCard 
     show={showCharacterCard}
     onClose={() => showCharacterCard = false}
     onOpenLightbox={() => showLightbox = true}
   />
 
-  <!-- Main Chat Card -->
+  <!-- main chat -->
   <div class="chat-card w-full max-w-2xl flex flex-col overflow-hidden" style="height: min(1000px, 90vh); width: clamp(320px, 90vw, 1200px);">
 
-    <!-- Header -->
     <ChatHeader 
       {isDark}
       {showCharacterCard}
@@ -462,7 +452,6 @@
       onClearChat={clearChat}
     />
 
-    <!-- Messages -->
     <div class="flex-1 overflow-y-auto px-5 py-5 flex flex-col gap-1.5 bg-white">
 
       {#each messages as msg, i (msg.id)}
@@ -491,7 +480,6 @@
       <div bind:this={bottomEl}></div>
     </div>
 
-    <!-- Input Area -->
     <ChatInput 
       bind:input
       {loading}
@@ -501,13 +489,13 @@
 
   </div>
 
-  <!-- Project Info Card (Right) -->
+  <!-- project card -->
   <ProjectCard 
     show={showProjectCard}
     onClose={() => showProjectCard = false}
   />
 
-  <!-- Chat History Panel -->
+  <!-- history panel -->
   <HistoryPanel 
     show={showHistoryPanel}
     {chatHistory}
@@ -521,7 +509,7 @@
 
 </div>
 
-<!-- Lightbox Modal -->
+<!-- lightbox -->
 <Lightbox 
   show={showLightbox}
   closing={closingLightbox}

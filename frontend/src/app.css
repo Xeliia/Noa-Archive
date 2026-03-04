@@ -46,7 +46,7 @@
   --radius-box: 1.5rem;
 }
 
-/* Nord Dark Theme (Polar Night) - similar to nordtheme.com */
+/* dark theme */
 [data-theme="nord-dark"] {
   --color-primary: #88C0D0;
   --color-primary-content: #ECEFF4;
@@ -81,7 +81,6 @@ body {
   overflow-x: auto;
 }
 
-/* Theme transition wrapper */
 .theme-wrapper {
   transition: background 0.4s ease;
 }
@@ -90,12 +89,11 @@ body {
   background: linear-gradient(135deg, #dde4ea 0%, #c8d5de 50%, #d8dee9 100%);
 }
 
-/* Dark mode background */
 .theme-wrapper[data-theme="nord-dark"] {
   background: linear-gradient(135deg, #2E3440 0%, #3B4252 50%, #2E3440 100%);
 }
 
-/* ── Universal transition for theme changes ── */
+/* theme transitions */
 .chat-card,
 .character-card,
 .project-card,
@@ -107,7 +105,7 @@ body {
   transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
 }
 
-/* ── Dark mode card styles ── */
+/* dark mode cards */
 [data-theme="nord-dark"] .chat-card,
 [data-theme="nord-dark"] .character-card,
 [data-theme="nord-dark"] .project-card,
@@ -133,7 +131,7 @@ body {
     0 0 80px -20px rgba(180, 142, 173, 0.08);
 }
 
-/* ── Dark mode text colors ── */
+/* dark mode text */
 [data-theme="nord-dark"] .text-nord-0 { color: #ECEFF4 !important; }
 [data-theme="nord-dark"] .text-nord-3 { color: #D8DEE9 !important; }
 [data-theme="nord-dark"] .text-nord-3\/70 { color: rgba(216, 222, 233, 0.7) !important; }
@@ -141,12 +139,12 @@ body {
 [data-theme="nord-dark"] .text-nord-3\/40 { color: rgba(216, 222, 233, 0.5) !important; }
 [data-theme="nord-dark"] .text-white { color: #ECEFF4 !important; }
 
-/* ── Dark mode backgrounds ── */
+/* dark mode backgrounds */
 [data-theme="nord-dark"] .bg-white { background-color: #2E3440 !important; }
 [data-theme="nord-dark"] .bg-nord-6 { background-color: #434C5E !important; }
 [data-theme="nord-dark"] .bg-nord-5 { background-color: #4C566A !important; }
 
-/* ── Dark mode borders ── */
+/* dark mode borders */
 [data-theme="nord-dark"] .border-nord-5 { border-color: #4C566A !important; }
 [data-theme="nord-dark"] .border-white { border-color: #434C5E !important; }
 
@@ -156,7 +154,7 @@ body {
   border-color: #4C566A !important;
 }
 
-/* Stats card dividers in dark mode - target the stat items directly */
+/* stats dividers dark mode */
 [data-theme="nord-dark"] .stats-grid > .stat-item {
   border-color: #4C566A !important;
 }
@@ -165,7 +163,7 @@ body {
   border-left-color: #4C566A !important;
 }
 
-/* ── Dark mode header icons ── */
+/* dark mode header icons */
 [data-theme="nord-dark"] .btn-ghost {
   color: #D8DEE9;
 }
@@ -175,7 +173,7 @@ body {
   color: #88C0D0;
 }
 
-/* ── Dark mode avatar borders for depth ── */
+/* dark mode avatar */
 [data-theme="nord-dark"] .header-avatar {
   box-shadow: 0 0 0 2px #4C566A, 0 0 0 4px rgba(136, 192, 208, 0.25);
 }
@@ -185,12 +183,12 @@ body {
   box-shadow: 0 0 6px rgba(163, 190, 140, 0.5);
 }
 
-/* Message avatars in dark mode */
+/* dark mode message avatars */
 [data-theme="nord-dark"] .msg-enter img.rounded-full {
   box-shadow: 0 0 0 1px #4C566A;
 }
 
-/* ── Dark mode input area ── */
+/* dark mode input */
 [data-theme="nord-dark"] .bg-nord-6.rounded-full {
   background-color: #3B4252 !important;
   box-shadow: inset 0 0 0 1px #4C566A;
@@ -204,7 +202,7 @@ body {
   color: #ECEFF4 !important;
 }
 
-/* ── Dark mode send button ── */
+/* dark mode send button */
 [data-theme="nord-dark"] .bg-nord-4\/60 {
   background-color: rgba(67, 76, 94, 0.6) !important;
 }
@@ -213,12 +211,12 @@ body {
   color: rgba(216, 222, 233, 0.4) !important;
 }
 
-/* ── Dark mode link buttons ── */
+/* dark mode link buttons */
 [data-theme="nord-dark"] .hover\:bg-nord-5:hover {
   background-color: #4C566A !important;
 }
 
-/* ── Dark mode scrollbar ── */
+/* dark mode scrollbar */
 [data-theme="nord-dark"] ::-webkit-scrollbar-thumb {
   background: #4C566A;
 }
@@ -233,7 +231,7 @@ body {
   background-color: rgba(67, 76, 94, 0.5) !important;
 }
 
-/* ── Dark mode close buttons ── */
+/* dark mode close buttons */
 [data-theme="nord-dark"] .bg-white\/80 {
   background-color: rgba(59, 66, 82, 0.9) !important;
 }
@@ -291,44 +289,41 @@ body {
   }
 }
 
-/* ── Chat card ── */
-/* (merged into the .chat-card rule above with transition) */
-
-/* ── Scrollbar ── */
+/* scrollbar */
 ::-webkit-scrollbar { width: 5px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: #D8DEE9; border-radius: 4px; }
 ::-webkit-scrollbar-thumb:hover { background: #81A1C1; }
 
-/* ── Message bubble styles ── */
+/* message bubbles */
 
-/* User (Sensei) bubble */
+/* user bubble */
 .msg-bubble-user {
   color: #2E3440;
   background-color: #88C0D0;
 }
 
-/* Assistant (Noa) bubble — light mode */
+/* assistant bubble */
 .msg-bubble-noa {
   background-color: #2E3440;
   color: #ECEFF4;
 }
 
-/* Assistant (Noa) bubble — dark mode: lighter bg to pop against dark chat area */
+/* assistant bubble dark */
 [data-theme="nord-dark"] .msg-bubble-noa {
   background-color: #434C5E;
   color: #ECEFF4;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(76, 86, 106, 0.5);
 }
 
-/* User (Sensei) bubble — dark mode: subtle glow for definition */
+/* user bubble dark */
 [data-theme="nord-dark"] .msg-bubble-user {
   background-color: #88C0D0;
   color: #2E3440;
   box-shadow: 0 1px 4px rgba(136, 192, 208, 0.3);
 }
 
-/* ── Waveform bars ── */
+/* waveform */
 .waveform-bar {
   display: inline-block;
   width: 2.5px;
@@ -336,7 +331,7 @@ body {
   background: #4C566A;
 }
 
-/* ── Animations ── */
+/* animations */
 @keyframes fadeSlideUp {
   from { opacity: 0; transform: translateY(12px); }
   to   { opacity: 1; transform: translateY(0); }
@@ -360,13 +355,13 @@ body {
   animation: dotBounce 1.4s ease-in-out infinite;
 }
 
-/* ── Info card panel wrapper (push animation) ── */
+/* card panel wrapper */
 .card-panel-wrapper {
   transition: width 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   border-radius: 24px;
 }
 
-/* ── Profile flip animation ── */
+/* profile flip */
 .profile-image-wrapper {
   perspective: 1000px;
   border: none;
@@ -403,7 +398,7 @@ body {
   transform: rotateY(180deg);
 }
 
-/* ── Main chat card transition ── */
+/* chat card */
 .chat-card {
   background: #ffffff;
   border-radius: 24px;
@@ -416,7 +411,7 @@ body {
   min-width: 320px;
 }
 
-/* ── Character/Project/History card styles ── */
+/* side cards */
 .character-card,
 .project-card,
 .history-card {
@@ -429,7 +424,7 @@ body {
   transition: background-color 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease, opacity 0.3s ease, transform 0.3s ease;
 }
 
-/* ── History item styles ── */
+/* history items */
 .history-item {
   background: transparent;
 }
@@ -458,23 +453,23 @@ body {
   background-color: rgba(136, 192, 208, 0.18);
 }
 
-/* ── History icon colors ── */
-/* Light mode: subtle neutral */
+/* history icon colors */
+/* light mode */
 .history-icon { color: rgba(76, 86, 106, 0.6); }
 
-/* Dark mode: cycle through Aurora colors */
+/* dark mode: aurora cycle */
 [data-theme="nord-dark"] .history-icon-0 { color: #BF616A; } /* Red */
 [data-theme="nord-dark"] .history-icon-1 { color: #D08770; } /* Orange */
 [data-theme="nord-dark"] .history-icon-2 { color: #EBCB8B; } /* Yellow */
 [data-theme="nord-dark"] .history-icon-3 { color: #A3BE8C; } /* Green */
 [data-theme="nord-dark"] .history-icon-4 { color: #B48EAD; } /* Purple */
 
-/* ── 3D Cover photo card ── */
+/* 3D cover card */
 .perspective-1000 {
   perspective: 1000px;
 }
 
-/* Smooth 3D tilt card (cursor-following) */
+/* tilt card */
 .tilt-card {
   transform-style: preserve-3d;
   transition: transform 0.15s ease-out, box-shadow 0.3s ease;
@@ -500,7 +495,7 @@ body {
     0 0 0 2px rgba(136, 192, 208, 0.4);
 }
 
-/* Lightbox 3D card (cursor-following) */
+/* lightbox 3D card */
 .cover-3d-card {
   transform-style: preserve-3d;
   transition: transform 0.15s ease-out, box-shadow 0.3s ease;
@@ -517,7 +512,7 @@ body {
     0 0 0 1px rgba(255, 255, 255, 0.1);
 }
 
-/* ── Lightbox ── */
+/* lightbox */
 @keyframes lightboxFadeIn {
   from { opacity: 0; }
   to   { opacity: 1; }
@@ -554,7 +549,7 @@ body {
   animation: lightboxScaleOut 0.25s cubic-bezier(0.4, 0, 1, 1) forwards;
 }
 
-/* ── Aurora Pills (Nord Aurora palette) ── */
+/* aurora pills */
 .aurora-pill {
   display: inline-flex;
   align-items: center;
@@ -569,7 +564,7 @@ body {
   white-space: nowrap;
 }
 
-/* Aurora Red (nord-11: #BF616A) */
+/* red */
 .aurora-red {
   background: rgba(191, 97, 106, 0.12);
   color: #BF616A;
@@ -582,7 +577,7 @@ body {
   box-shadow: 0 4px 12px rgba(191, 97, 106, 0.3);
 }
 
-/* Aurora Orange (nord-12: #D08770) */
+/* orange */
 .aurora-orange {
   background: rgba(208, 135, 112, 0.12);
   color: #D08770;
@@ -595,7 +590,7 @@ body {
   box-shadow: 0 4px 12px rgba(208, 135, 112, 0.3);
 }
 
-/* Aurora Yellow (nord-13: #EBCB8B) */
+/* yellow */
 .aurora-yellow {
   background: rgba(235, 203, 139, 0.12);
   color: #c9a227;
@@ -608,7 +603,7 @@ body {
   box-shadow: 0 4px 12px rgba(235, 203, 139, 0.3);
 }
 
-/* Aurora Green (nord-14: #A3BE8C) */
+/* green */
 .aurora-green {
   background: rgba(163, 190, 140, 0.12);
   color: #A3BE8C;
@@ -621,7 +616,7 @@ body {
   box-shadow: 0 4px 12px rgba(163, 190, 140, 0.3);
 }
 
-/* Aurora Purple (nord-15: #B48EAD) */
+/* purple */
 .aurora-purple {
   background: rgba(180, 142, 173, 0.12);
   color: #B48EAD;
@@ -634,7 +629,7 @@ body {
   box-shadow: 0 4px 12px rgba(180, 142, 173, 0.3);
 }
 
-/* Dark mode aurora pills - brighter and more vibrant */
+/* dark mode aurora pills */
 [data-theme="nord-dark"] .aurora-red {
   background: rgba(191, 97, 106, 0.25);
   border-color: rgba(191, 97, 106, 0.5);
@@ -666,7 +661,7 @@ body {
   box-shadow: 0 2px 12px rgba(180, 142, 173, 0.3);
 }
 
-/* ── Dark mode aurora accents for UI elements ── */
+/* dark mode aurora accents */
 [data-theme="nord-dark"] .profile-image-wrapper {
   background: linear-gradient(135deg, rgba(136, 192, 208, 0.3), rgba(180, 142, 173, 0.3));
   box-shadow: 0 8px 32px rgba(136, 192, 208, 0.3), 0 0 0 2px rgba(136, 192, 208, 0.2);
@@ -681,11 +676,9 @@ body {
   box-shadow: 0 0 8px rgba(163, 190, 140, 0.6);
 }
 
-/* ═══════════════════════════════════════════════════════════════════════════════
-   MOBILE/TABLET RESPONSIVE STYLES
-   ═══════════════════════════════════════════════════════════════════════════════ */
+/* responsive */
 
-/* Base mobile overlay styles (used by both mobile and tablet) */
+/* mobile overlay */
 .mobile-overlay {
   position: fixed;
   inset: 0;
@@ -767,26 +760,26 @@ body {
     border-radius: 0 !important;
   }
 
-  /* Adjust header padding */
+  /* header padding */
   .chat-card .flex.items-center.gap-3.px-6 {
     padding-left: 1rem !important;
     padding-right: 1rem !important;
   }
 
-  /* Adjust message area padding */
+  /* message area padding */
   .chat-card .overflow-y-auto.px-5 {
     padding-left: 0.75rem !important;
     padding-right: 0.75rem !important;
   }
 
-  /* Adjust input area padding */
+  /* input area padding */
   .chat-card .px-5.py-4 {
     padding-left: 0.75rem !important;
     padding-right: 0.75rem !important;
     padding-bottom: max(1rem, env(safe-area-inset-bottom)) !important;
   }
 
-  /* Lightbox adjustments for mobile */
+  /* lightbox mobile */
   .lightbox-overlay {
     padding: 1rem !important;
   }

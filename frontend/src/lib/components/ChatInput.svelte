@@ -34,7 +34,6 @@
 <div class="px-5 py-4 border-t border-nord-5 rounded-b-[24px]">
   <div class="flex items-center gap-2 bg-nord-6 rounded-full px-4 py-1.5 transition-all duration-200 focus-within:ring-2 focus-within:ring-nord-8/30">
 
-    <!-- Input -->
     <textarea
       bind:this={textareaEl}
       bind:value={input}
@@ -46,7 +45,6 @@
       class="flex-1 bg-transparent border-none outline-none resize-none text-sm text-nord-0 placeholder-nord-3/50 max-h-28 py-2.5 leading-none"
     ></textarea>
 
-    <!-- Send / Stop -->
     {#if loading}
       <button
         class="w-10 h-10 rounded-full flex items-center justify-center shrink-0 border-none transition-all duration-200

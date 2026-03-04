@@ -15,7 +15,6 @@
 
 <div class="card-panel-wrapper shrink-0 overflow-hidden transition-all duration-300 ease-out {show ? '' : 'max-lg:pointer-events-none'}" style="width: {show ? '22rem' : '0'}; height: min(700px, 85vh);">
   <div class="history-card w-[22rem] h-full flex flex-col rounded-3xl overflow-hidden" style="opacity: {show ? '1' : '0'}; transform: translateX({show ? '0' : '-100%'});">
-    <!-- Close button -->
     <button 
       class="absolute top-3 right-3 z-10 w-8 h-8 rounded-full bg-white/80 backdrop-blur flex items-center justify-center text-nord-3 hover:text-nord-0 hover:bg-white transition-all shadow-sm cursor-pointer"
       onclick={onClose}
@@ -23,7 +22,6 @@
       <X size={16} />
     </button>
 
-    <!-- Header -->
     <div class="px-6 pt-8 pb-4">
       <div class="flex items-center gap-2 mb-1">
         <History size={20} class="text-nord-0" />
@@ -32,10 +30,8 @@
       <p class="text-sm text-nord-3">{chatHistory.length} saved conversation{chatHistory.length !== 1 ? 's' : ''}</p>
     </div>
 
-    <!-- Divider -->
     <div class="mx-6 border-t border-nord-5"></div>
 
-    <!-- History list -->
     <div class="flex-1 overflow-y-auto px-4 py-3">
       {#if chatHistory.length === 0}
         <div class="flex flex-col items-center justify-center h-full text-center px-4">
@@ -75,7 +71,6 @@
       {/if}
     </div>
 
-    <!-- Footer -->
     {#if chatHistory.length > 0}
       <div class="px-6 py-4 border-t border-nord-5 bg-nord-6/50">
         <button 

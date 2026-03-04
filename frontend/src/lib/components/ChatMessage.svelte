@@ -9,7 +9,6 @@
 </script>
 
 {#if msg.role === 'user'}
-  <!-- User message (right-aligned, no avatar) -->
   <div class="msg-enter flex flex-col items-end">
     <div class="msg-bubble-user max-w-[78%] px-4 py-2.5 text-sm leading-relaxed whitespace-pre-wrap rounded-[18px] rounded-br-[4px]">
       {msg.content}
@@ -26,7 +25,6 @@
     {/if}
   </div>
 {:else}
-  <!-- Assistant message (left-aligned, with avatar) -->
   {#if msg.content}
   <div class="msg-enter flex gap-2 items-end">
     {#if showAvatar}
