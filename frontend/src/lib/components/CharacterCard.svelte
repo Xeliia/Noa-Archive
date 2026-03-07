@@ -1,5 +1,8 @@
 <script>
   import { X, Cake } from 'lucide-svelte'
+  import miniProfile from '../assets/mini-profile.png'
+  import miniProfile2 from '../assets/mini-profile2.png'
+  import coverPhoto from '../assets/cover-photo.jpg'
 
   let {
     show = false,
@@ -44,8 +47,8 @@
           onclick={() => profileFlipped = !profileFlipped}
         >
           <div class="flipper w-full h-full">
-            <img src="/src/lib/assets/mini-profile.png" alt="Ushio Noa - Front" class="profile-face profile-front" />
-            <img src="/src/lib/assets/mini-profile2.png" alt="Ushio Noa - Back" class="profile-face profile-back" />
+            <img src={miniProfile} alt="Ushio Noa - Front" class="profile-face profile-front" />
+            <img src={miniProfile2} alt="Ushio Noa - Back" class="profile-face profile-back" />
           </div>
         </button>
       </div>
@@ -73,7 +76,7 @@
         onmouseleave={handleTiltLeave}
       >
         <img 
-          src="/src/lib/assets/cover-photo.jpg" 
+          src={coverPhoto} 
           alt="Noa Cover" 
           class="w-full h-full object-cover" 
         />

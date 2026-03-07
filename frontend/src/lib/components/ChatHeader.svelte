@@ -1,5 +1,6 @@
 <script>
   import { Send, Trash, Info, X, Sun, Moon, History } from 'lucide-svelte'
+  import miniProfile from '../assets/mini-profile.png'
 
   let {
     isDark,
@@ -19,7 +20,7 @@
     class="relative group cursor-pointer"
     onclick={onToggleCharacter}
   >
-    <img src="/src/lib/assets/mini-profile.png" alt="Ushio Noa" class="header-avatar w-11 h-11 rounded-full object-cover shadow-sm transition-transform group-hover:scale-105" />
+    <img src={miniProfile} alt="Ushio Noa" class="header-avatar w-11 h-11 rounded-full object-cover shadow-sm transition-transform group-hover:scale-105" />
     <span class="status-indicator absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-nord-14 rounded-full border-2 border-white"></span>
   </button>
 

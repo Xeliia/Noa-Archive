@@ -1,4 +1,6 @@
 <script>
+  import miniProfile from '../assets/mini-profile.png'
+
   let {
     msg,
     showTime = false,
@@ -19,7 +21,7 @@
           <span class="text-[11px] text-nord-3/70">{formatTime(msg.time)}</span>
         {/if}
         {#if showSeen}
-          <img src="/src/lib/assets/mini-profile.png" alt="Seen" class="w-3.5 h-3.5 rounded-full object-cover" />
+          <img src={miniProfile} alt="Seen" class="w-3.5 h-3.5 rounded-full object-cover" />
         {/if}
       </div>
     {/if}
@@ -28,7 +30,7 @@
   {#if msg.content}
   <div class="msg-enter flex gap-2 items-end">
     {#if showAvatar}
-      <img src="/src/lib/assets/mini-profile.png" alt="Ushio Noa" class="w-7 h-7 rounded-full object-cover shrink-0" />
+      <img src={miniProfile} alt="Ushio Noa" class="w-7 h-7 rounded-full object-cover shrink-0" />
     {:else}
       <div class="w-7 shrink-0"></div>
     {/if}

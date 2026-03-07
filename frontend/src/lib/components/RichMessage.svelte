@@ -1,5 +1,6 @@
 <script>
   import { Eye, Pen, Book } from 'lucide-svelte'
+  import miniProfile from '../assets/mini-profile.png'
 
   let {
     msg,
@@ -11,7 +12,7 @@
 
 <div class="msg-enter flex gap-2 items-end">
   {#if showAvatar}
-    <img src="/src/lib/assets/mini-profile.png" alt="Ushio Noa" class="w-7 h-7 rounded-full object-cover shrink-0" />
+    <img src={miniProfile} alt="Ushio Noa" class="w-7 h-7 rounded-full object-cover shrink-0" />
   {:else}
     <div class="w-7 shrink-0"></div>
   {/if}

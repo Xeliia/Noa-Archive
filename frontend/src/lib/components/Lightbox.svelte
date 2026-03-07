@@ -1,5 +1,6 @@
 <script>
   import { X } from 'lucide-svelte'
+  import coverPhoto from '../assets/cover-photo.jpg'
 
   let {
     show = false,
@@ -49,7 +50,7 @@
         aria-label="Noa cover photo with 3D tilt effect"
       >
         <img 
-          src="/src/lib/assets/cover-photo.jpg" 
+          src={coverPhoto} 
           alt="Noa Cover" 
           class="w-auto h-auto max-w-full max-h-[80vh] object-contain"
         />
