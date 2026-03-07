@@ -62,6 +62,9 @@ class Settings(BaseSettings):
     # Examples: "noa.txt" or "You are a helpful assistant..."
     system_prompt: str = "noa.txt"
     
+    # Rate limiting (requests per window, e.g. "20/minute", "100/hour")
+    rate_limit: str = "20/minute"
+
     temperature: float = 0.8
     max_tokens: int = 512
     top_p: float = 0.9

@@ -1,19 +1,27 @@
-from fastapi import FastAPI, HTTPException, Depends, Header
+from fastapi import FastAPI, HTTPException, Depends, Header, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 import httpx
 import json
 from typing import AsyncGenerator
+from slowapi import Limiter, _rate_limit_exceeded_handler
+from slowapi.util import get_remote_address
+from slowapi.errors import RateLimitExceeded
 
 from config import get_settings, Settings, LLMBackendType
 
 app = FastAPI(title="Simple Chatbot API")
 
 settings = get_settings()
+
+limiter = Limiter(key_func=get_remote_address)
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[settings.frontend_url, "*"],
+    allow_origins=[settings.frontend_url],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -155,14 +163,16 @@ async def health_check():
 
 
 @app.post("/chat")
+@limiter.limit(settings.rate_limit)
 async def chat(
-    request: ChatRequest,
+    request: Request,
+    body: ChatRequest,
     _: bool = Depends(verify_api_key),
     settings: Settings = Depends(get_settings)
 ):
-    if request.stream:
+    if body.stream:
         return StreamingResponse(
-            stream_chat_response(request.messages, settings),
+            stream_chat_response(body.messages, settings),
             media_type="text/event-stream",
             headers={
                 "Cache-Control": "no-cache",
@@ -170,12 +180,14 @@ async def chat(
             }
         )
     else:
-        content = await get_chat_response(request.messages, settings)
+        content = await get_chat_response(body.messages, settings)
         return {"content": content}
 
 
 @app.get("/models")
+@limiter.limit("10/minute")
 async def list_models(
+    request: Request,
     _: bool = Depends(verify_api_key),
     settings: Settings = Depends(get_settings)
 ):
@@ -193,7 +205,9 @@ async def list_models(
 
 
 @app.get("/config")
+@limiter.limit("10/minute")
 async def get_config(
+    request: Request,
     _: bool = Depends(verify_api_key),
     settings: Settings = Depends(get_settings)
 ):
